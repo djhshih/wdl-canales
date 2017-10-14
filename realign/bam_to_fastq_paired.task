@@ -2,23 +2,29 @@ task bam_to_fastq_paired {
 	File input_bam
 	String sample_id
 
-	Int preemptible_tries = 3
-	Int diskspace = ceil(2 * size(input_bam, "GB"))
+	Int diskspace_gb = ceil(4 * size(input_bam, "GB"))
+	Int memory_gb
+	Int preemptible_tries
 
 	command <<<
+		# sort the BAM file by qname (read name)
+		# s.t. downstream insert size calculation is not biased
+		samtools sort -m ${memory_gb}G -n -l 1 -o qname-sorted.bam ${input_bam}
 		# NB no read group information is preserved, because external
 		#    samples rarely have propr read group field values
 		# outputs will be minimally compressed (level=1)
-		java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx512M \
+		java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx${memory_gb}G \
 			-Dsamjdk.buffer_size=131072 -Dsamjdk.use_async_io=true \
 			-Dsamjdk.compression_level=1  \
 			-jar /usr/gitc/picard.jar SamToFastq \
 			TMP_DIR=. \
-			INPUT=${input_bam} \
-			FASTQ=${sample_id}_r1.fastq.gz \
-			SECOND_END_FASTQ=${sample_id}_r2.fastq.gz \
+			INPUT=qname-sorted.bam \
+			FASTQ=${sample_id}_R1.fastq.gz \
+			SECOND_END_FASTQ=${sample_id}_R2.fastq.gz \
 			UNPAIRED_FASTQ=${sample_id}_unpaired.fastq.gz \
-			INCLUDE_NON_PF_READS=true \
+			INCLUDE_NON_PF_READS=true
+
+		exit 0
 	>>>
 
 	output {
@@ -29,9 +35,9 @@ task bam_to_fastq_paired {
 
 	runtime {
 		docker: "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817"
-		memory: "1 GB"
+		memory: "${memory_gb} GB"
 		cpu: "1"
-		disks: "local-disk ${diskspace} HDD"
+		disks: "local-disk ${diskspace_gb} HDD"
 		preemptible: preemptible_tries
 	}
 }
