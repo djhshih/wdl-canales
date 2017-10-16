@@ -27,7 +27,7 @@ task bwa_mem_paired_bam {
 
 		# reads should be be sorted by genomic location in order to avoid bias in
 		# insert size calculation during alignment; thus, sort by read name
-		sambamba sort -t ${cpu} -m ${memory_gb}G -N ${input_bam} -o qname-sorted.bam
+		sambamba sort -t ${cpu} -m ${memory_gb}G -N -l 1 -o qname-sorted.bam ${input_bam}
 		rm ${input_bam}
 
 		# extract reads from the BAM file and write to fifo
