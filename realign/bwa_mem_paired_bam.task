@@ -32,28 +32,29 @@ task bwa_mem_paired_bam {
 
 		# extract reads from the BAM file and write to fifo
 		# NB will *not* work if the BAM file have unpaired reads that are not marked!
-		#mkfifo r1.fastq
-		#mkfifo r2.fastq
+		mkfifo r1.fastq
+		mkfifo r2.fastq
 		samtools fastq qname-sorted.bam \
-			-0 unpaired.fastq \
+			-0 marked-unpaired.fastq \
 			-1 r1.fastq \
 			-2 r2.fastq \
-			#&
+			&
 		
 		# consume reads from fifo, align them, mark duplicates, and 
 		# create unsorted bam file with fast compression
 		# difference in duplicate marking between samblaster and Picard:
 		#  the first encountered read-pair of a duplicate set will considered as the 
 		#  prototype instead of the 'best' read-pair
-		bwa mem -Y -t ${cpu} ${ref_fasta} r1.fastq r2.fastq \
+		pairfq r1.fastq r2.fastq /dev/stdout unmarked-unpaired.fastq \
+			| bwa mem -Y -t ${cpu} ${ref_fasta} -p - \
 			| samblaster | samtools view -b1 - \
 			> unsorted.bam
-		#rm r1.fastq
-		#rm r2.fastq
+		rm r1.fastq
+		rm r2.fastq
 		
 		# sort alignments with ample RAM to avoid disk IO and create final bam file
 		sambamba sort -t ${cpu} -m ${memory_gb}G unsorted.bam -o ${sample_id}.bam
-		#rm unsorted.bam
+		rm unsorted.bam
 
 		# sambamba sort already created .bai but we will rename it
 		mv ${sample_id}.bam.bai ${sample_id}.bai
