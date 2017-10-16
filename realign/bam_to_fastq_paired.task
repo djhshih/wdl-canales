@@ -7,9 +7,26 @@ task bam_to_fastq_paired {
 	Int preemptible_tries
 
 	command <<<
-		# sort the BAM file by qname (read name)
+		set -eu
+
+		# discard alignment information and sort reads by name
 		# s.t. downstream insert size calculation is not biased
-		samtools sort -m ${memory_gb}G -n -l 1 -o qname-sorted.bam ${input_bam}
+		java -Xmx${memory_gb}G \
+			-jar /usr/gitc/picard.jar RevertSam \
+			INPUT=${input_bam} \
+			OUTPUT=unaligned.bam \
+			SANITIZE=true \
+			ATTRIBUTE_TO_CLEAR=XT \
+			ATTRIBUTE_TO_CLEAR=XN \
+			ATTRIBUTE_TO_CLEAR=AS \
+			ATTRIBUTE_TO_CLEAR=OC \
+			ATTRIBUTE_TO_CLEAR=OP \
+			SORT_ORDER=queryname \
+			RESTORE_ORIGINAL_QUALITIES=true \
+			REMOVE_DUPLICATE_INFORMATION=true \
+			REMOVE_ALIGNMENT_INFORMATION=true \
+			MAX_DISCARD_FRACTION=1.0
+
 		# NB no read group information is preserved, because external
 		#    samples rarely have propr read group field values
 		# outputs will be minimally compressed (level=1)
@@ -18,13 +35,11 @@ task bam_to_fastq_paired {
 			-Dsamjdk.compression_level=1  \
 			-jar /usr/gitc/picard.jar SamToFastq \
 			TMP_DIR=. \
-			INPUT=qname-sorted.bam \
+			INPUT=unaligned.bam \
 			FASTQ=${sample_id}_R1.fastq.gz \
 			SECOND_END_FASTQ=${sample_id}_R2.fastq.gz \
 			UNPAIRED_FASTQ=${sample_id}_unpaired.fastq.gz \
 			INCLUDE_NON_PF_READS=true
-
-		exit 0
 	>>>
 
 	output {
