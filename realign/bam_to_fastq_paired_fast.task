@@ -2,33 +2,48 @@ task bam_to_fastq_paired_fast {
 	File input_bam
 	String sample_id
 
-	Int diskspace_gb = ceil(6 * size(input_bam, "GB"))
+	Int diskspace_gb = ceil(4 * size(input_bam, "GB"))
+	Int cpu
 	Int memory_gb
 	Int preemptible_tries
 
 	command <<<
+		set -eu
+
 		# sort the BAM file by qname (read name)
 		# s.t. downstream insert size calculation is not biased
-		sambamba sort -m ${memory_gb}G -N -l 1 -o sorted.bam ${input_bam}
-		# NB no read group information is preserved, because external
-		#    samples rarely have propr read group field values
-		# outputs will be minimally compressed (level=1)
-		# samtools fastq does *not* support automatic gz compression
-		samtools fastq ${input_bam}
+		sambamba sort -t ${cpu} -m ${memory_gb}G -N -l 1 -o qname-sorted.bam ${input_bam}
+		rm ${input_bam}
+
+		# extract reads from the BAM file and write to fifo
+		# NB will *not* work if the BAM file have unpaired reads that are not marked!
+		mkfifo r1.fastq
+		mkfifo r2.fastq
+		samtools fastq qname-sorted.bam \
 			-0 ${sample_id}_unpaired.fastq \
-			-1 ${sample_id}_R1.fastq \ -2 ${sample_id}_R2.fastq \
+			-1 r1.fastq \
+			-2 r2.fastq \
+			&
+
+		# consume reads from fifos and create interleaved fastq
+		pairfq r1.fastq r2.fastq /dev/stdout ${sample_id}_unpaired_unmarked.fastq \
+			| gzip > ${sample_id}_R1_R2.fastq.gz
+		rm r1.fastq r2.fastq
+
+		gzip ${sample_id}_unpaired.fastq
+		gzip ${sample_id}_unpaired_unmarked.fastq
 	>>>
 
 	output {
-		File fastq_r1 = "${sample_id}_R1.fastq"
-		File fastq_r2 = "${sample_id}_R2.fastq"
-		File fastq_unpaired = "${sample_id}_unpaired.fastq"
+		File fastq_r1_r2 = "${sample_id}_R1_R2.fastq.gz"
+		File fastq_unpaired = "${sample_id}_unpaired.fastq.gz"
+		File fastq_unpaired_unmarked = "${sample_id}_unpaired_unmarked.fastq.gz"
 	}
 
 	runtime {
 		docker: "djhshih/seqkit:0.1"
 		memory: "${memory_gb} GB"
-		cpu: "1"
+		cpu: "${cpu}"
 		disks: "local-disk ${diskspace_gb} HDD"
 		preemptible: preemptible_tries
 	}

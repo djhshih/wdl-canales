@@ -9,11 +9,10 @@ task bwa_mem_paired_fast {
 	File ref_fasta_sa
 	# optional list of contigs that are "alternative"
 	File? ref_fasta_alt
-	File fastq_r1
-	File fastq_r2
+	File fastq_r1_r2
 	String sample_id
 
-	Int diskspace_gb = ceil(4 * (size(fastq_r1, "GB") + size(fastq_r2, "GB")))
+	Int diskspace_gb = ceil(4 * size(fastq_r1_r2, "GB"))
 	Int cpu
 	Int memory_gb
 	Int preemptible_tries
@@ -30,11 +29,10 @@ task bwa_mem_paired_fast {
 		# difference in duplicate marking between samblaster and Picard:
 		#  the first encountered read-pair of a duplicate set will considered as the 
 		#  prototype instead of the 'best' read-pair
-		bwa mem -Y -t ${cpu} ${ref_fasta} ${fastq_r1} ${fastq_r2} \
+		bwa mem -Y -t ${cpu} -p ${ref_fasta} ${fastq_r1_r2} \
 			| samblaster | samtools view -b1 - \
 			> unsorted.bam
-		rm ${fastq_r1}
-		rm ${fastq_r2}
+		rm ${fastq_r1_r2}
 		
 		# sort alignments with ample RAM to avoid disk IO and create final bam file
 		sambamba sort -t ${cpu} -m ${memory_gb}G unsorted.bam -o ${sample_id}.bam
