@@ -1,0 +1,11 @@
+date	start_time	zone	machine_type	time_to_preempt	prev_preempts
+2017-10-17	12:33	us-central1-b	n1-standard-8	39m+	0
+2017-10-16	19:17	us-central1-b	n1-standard-2	26m	0
+2017-10-16	19:44	us-central1-b	n1-standard-2	1h11m	1
+2017-10-16	20:55	us-central1-b	n1-standard-2	4h38m+	2
+2017-10-16	12:55	us-central1-b	n1-standard-8	5h43m+	0
+2017-10-17	12:34	us-central1-b	n1-standard-2	5h2m+	0
+2017-10-17	12:39	us-central1-b	n1-standard-2	3h14m+	0
+2017-10-17	15:53	us-central1-b	n1-standard-2	16m	1
+2017-10-17	16:10	us-central1-b	n1-standard-2	5m	2
+2017-10-17	14:41	us-central1-b	n1-standard-2	1h45m+	0
