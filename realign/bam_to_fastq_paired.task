@@ -2,7 +2,9 @@ task bam_to_fastq_paired {
 	File input_bam
 	String sample_id
 
-	Int diskspace_gb = ceil(4 * size(input_bam, "GB"))
+	# Picard RevertSam uses a lot of temporary disk space!
+	# (This is probably due to external sorting.)
+	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
 	Int memory_gb
 	Int preemptible_tries
 
@@ -12,6 +14,7 @@ task bam_to_fastq_paired {
 		# discard alignment information and sort reads by name
 		# s.t. downstream insert size calculation is not biased
 		java -Xmx${memory_gb}G \
+			-Dsamjdk.compression_level=1 \
 			-jar /usr/gitc/picard.jar RevertSam \
 			INPUT=${input_bam} \
 			OUTPUT=unaligned.bam \
@@ -26,11 +29,13 @@ task bam_to_fastq_paired {
 			REMOVE_DUPLICATE_INFORMATION=true \
 			REMOVE_ALIGNMENT_INFORMATION=true \
 			MAX_DISCARD_FRACTION=1.0
+		rm ${input_bam}
 
 		# NB no read group information is preserved, because external
 		#    samples rarely have propr read group field values
 		# outputs will be minimally compressed (level=1)
-		java -XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10 -Xmx${memory_gb}G \
+		java -Xmx${memory_gb}G \
+			-XX:GCTimeLimit=50 -XX:GCHeapFreeLimit=10  \
 			-Dsamjdk.buffer_size=131072 -Dsamjdk.use_async_io=true \
 			-Dsamjdk.compression_level=1  \
 			-jar /usr/gitc/picard.jar SamToFastq \
