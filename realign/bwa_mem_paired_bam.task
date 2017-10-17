@@ -16,7 +16,6 @@ task bwa_mem_paired_bam {
 	Int memory_gb
 	Int preemptible_tries
 
-	Int nthreads = cpu - 1
 	Int memory_mb_thread = floor(0.8 * memory_gb * 1024 / cpu)
 	Int diskspace_gb = ceil(5 * size(input_bam, "GB"))
 
@@ -30,7 +29,7 @@ task bwa_mem_paired_bam {
 
 		# reads should be be sorted by genomic location in order to avoid bias in
 		# insert size calculation during alignment; thus, sort by read name
-		samtools sort -@ ${nthreads} -m ${memory_mb_thread}M -n -l l -o qname-sorted.bam ${input_bam}
+		samtools sort -@ ${cpu} -m ${memory_mb_thread}M -n -l l -o qname-sorted.bam ${input_bam}
 		rm ${input_bam}
 
 		# extract reads from the BAM file and write to fifo
@@ -56,7 +55,7 @@ task bwa_mem_paired_bam {
 		rm r2.fastq
 		
 		# sort alignments with ample RAM to avoid disk IO and create final bam file
-		samtools sort -@ ${nthreads} -m ${memory_mb_thread}M -o ${sample_id}.bam unsorted.bam
+		samtools sort -@ ${cpu} -m ${memory_mb_thread}M -o ${sample_id}.bam unsorted.bam
 		rm unsorted.bam
 
 		# index the bam file
