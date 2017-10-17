@@ -2,17 +2,20 @@ task bam_to_fastq_paired_fast {
 	File input_bam
 	String sample_id
 
-	Int diskspace_gb = ceil(4 * size(input_bam, "GB"))
 	Int cpu
 	Int memory_gb
 	Int preemptible_tries
+
+	Int nthreads = cpu - 1
+	Int memory_mb_thread = memory_gb * 1024 / cpu
+	Int diskspace_gb = ceil(5 * size(input_bam, "GB"))
 
 	command <<<
 		set -eu
 
 		# sort the BAM file by qname (read name)
 		# s.t. downstream insert size calculation is not biased
-		sambamba sort -t ${cpu} -m ${memory_gb}G -N -l 1 -o qname-sorted.bam ${input_bam}
+		samtools sort -@ ${nthreads} -m ${memory_mb_thread}M -n -l l -o qname-sorted.bam ${input_bam}
 		rm ${input_bam}
 
 		# extract reads from the BAM file and write to fifo

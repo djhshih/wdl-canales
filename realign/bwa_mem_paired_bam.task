@@ -12,22 +12,25 @@ task bwa_mem_paired_bam {
 	File input_bam
 	String sample_id
 
-	Int diskspace_gb = ceil(4 * size(input_bam, "GB"))
 	Int cpu
 	Int memory_gb
 	Int preemptible_tries
+
+	Int nthreads = cpu - 1
+	Int memory_mb_thread = memory_gb * 1024 / cpu
+	Int diskspace_gb = ceil(5 * size(input_bam, "GB"))
 
 	command <<<
 		set -eu
 		
 		if [[ ! -f ${ref_fasta_sa} ]]; then
-			#	index the reference fasta if it is missing
+			# index the reference fasta if it is missing
 			bwa index -a bwtsw ${ref_fasta}
 		fi
 
 		# reads should be be sorted by genomic location in order to avoid bias in
 		# insert size calculation during alignment; thus, sort by read name
-		sambamba sort -t ${cpu} -m ${memory_gb}G -N -l 1 -o qname-sorted.bam ${input_bam}
+		samtools sort -@ ${nthreads} -m ${memory_mb_thread}M -n -l l -o qname-sorted.bam ${input_bam}
 		rm ${input_bam}
 
 		# extract reads from the BAM file and write to fifo
@@ -53,11 +56,11 @@ task bwa_mem_paired_bam {
 		rm r2.fastq
 		
 		# sort alignments with ample RAM to avoid disk IO and create final bam file
-		sambamba sort -t ${cpu} -m ${memory_gb}G unsorted.bam -o ${sample_id}.bam
+		samtools sort -@ ${nthreads} -m ${memory_mb_thread}M -o ${sample_id}.bam unsorted.bam
 		rm unsorted.bam
 
-		# sambamba sort already created .bai but we will rename it
-		mv ${sample_id}.bam.bai ${sample_id}.bai
+		# index the bam file
+		samtools index ${sample_id}.bam ${sample_id}.bai
 	>>>
 
 	output {

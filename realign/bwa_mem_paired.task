@@ -13,10 +13,13 @@ task bwa_mem_paired {
 	File fastq_r2
 	String sample_id
 
-	Int diskspace_gb = ceil(4 * (size(fastq_r1, "GB") + size(fastq_r2, "GB")))
 	Int cpu
 	Int memory_gb
 	Int preemptible_tries
+
+	Int nthreads = cpu - 1
+	Int memory_mb_thread = memory_gb * 1024 / cpu
+	Int diskspace_gb = ceil(5 * (size(fastq_r1, "GB") + size(fastq_r2, "GB")))
 
 	command <<<
 		set -eu
@@ -34,7 +37,7 @@ task bwa_mem_paired {
 		rm ${fastq_r2}
 		
 		# sort alignments
-		samtools sort unsorted.bam -o sorted.bam
+		samtools sort -@ ${nthreads} -m ${memory_mb_thread}M -o sorted.bam unsorted.bam
 		rm unsorted.bam
 		
 		# mark duplicates

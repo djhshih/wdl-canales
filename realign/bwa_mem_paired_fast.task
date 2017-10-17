@@ -12,10 +12,13 @@ task bwa_mem_paired_fast {
 	File fastq_r1_r2
 	String sample_id
 
-	Int diskspace_gb = ceil(4 * size(fastq_r1_r2, "GB"))
 	Int cpu
 	Int memory_gb
 	Int preemptible_tries
+
+	Int nthreads = cpu - 1
+	Int memory_mb_thread = memory_gb * 1024 / cpu
+	Int diskspace_gb = ceil(5 * size(fastq_r1_r2, "GB"))
 
 	command <<<
 		set -eu
@@ -35,11 +38,11 @@ task bwa_mem_paired_fast {
 		rm ${fastq_r1_r2}
 		
 		# sort alignments with ample RAM to avoid disk IO and create final bam file
-		sambamba sort -t ${cpu} -m ${memory_gb}G unsorted.bam -o ${sample_id}.bam
+		samtools sort -@ ${nthreads} -m ${memory_mb_thread}M -o ${sample_id}.bam unsorted.bam
 		rm unsorted.bam
 
-		# sambamba sort already created .bai but we will rename it
-		mv ${sample_id}.bam.bai ${sample_id}.bai
+		# index the bam file
+		samtools index ${sample_id}.bam ${sample_id}.bai
 	>>>
 
 	output {
