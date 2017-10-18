@@ -23,7 +23,7 @@ with open(workflow_fpath) as inf:
             include_fname = m.group(1)
             include_fpath = os.path.join(os.path.dirname(workflow_fpath), include_fname)
             if not os.path.exists(include_fpath):
-                raise RuntimeError("Include file '%s' does not exist".format(include_fpath))
+                raise RuntimeError("Include file '{}' does not exist".format(include_fpath))
             with open(include_fpath) as f:
                 out.write(f.read() + '\n')
         else:
