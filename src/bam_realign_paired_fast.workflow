@@ -20,6 +20,6 @@ workflow bam_realign_paired_fast {
 	call bam_sort_coord {
 		input:
 			sample_id = sample_id,
-			input_bam = fastq_mem_paired.bam
+			input_bam = fastq_bwa_mem_paired.bam
 	}
 }
