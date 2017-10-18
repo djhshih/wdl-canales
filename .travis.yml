@@ -1,0 +1,9 @@
+dist: trusty
+sudo: required
+services:
+  - docker
+jdk: openjdk8
+install:
+  - DESTDIR=$(pwd) ./bin/install-cromwell.sh
+script:
+  - make check
