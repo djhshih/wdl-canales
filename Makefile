@@ -1,5 +1,5 @@
 build = ./bin/wdl-assemble.py
-run = ./bin/cromwell run
+check = ./bin/check-wdl.sh 
 
 targets = \
 	wdl/bam_realign_paired.wdl \
@@ -17,8 +17,8 @@ clean:
 	rm -rf wdl/*
 
 bin/cromwell:
-	DESTDIR=$(pwd) bin/install-cromwell.sh
+	DESTDIR=. bin/install-cromwell.sh
 
-check: bin/cromwell
-	$(run) 
+check: $(targets) bin/cromwell
+	for f in $^; do $(check) $$f test; done
 

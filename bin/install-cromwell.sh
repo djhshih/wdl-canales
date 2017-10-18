@@ -14,6 +14,7 @@ url=https://github.com/$author/$repo/releases/download/${version}/${name}-${vers
 # set the installation directory
 
 target_dir=${DESTDIR:-$HOME/.cromwell}
+echo "Installing to $target_dir ..."
 
 # download source files for tmux, libevent, and ncurses
 # save them in /tmp
