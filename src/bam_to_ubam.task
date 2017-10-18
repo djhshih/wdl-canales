@@ -1,0 +1,47 @@
+# Convert BAM file into unaligned BAM file
+# where the reads are sorted by name.
+task bam_to_ubam {
+	File input_bam
+	String sample_id
+
+	# Picard RevertSam uses a lot of temporary disk space!
+	# (This is probably due to external sorting.)
+	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
+	Int memory_gb
+	Int preemptible_tries
+
+	command <<<
+		set -eu
+
+		# discard alignment information and sort reads by name
+		# s.t. downstream insert size calculation is not biased
+		java -Xmx${memory_gb}G \
+			-Dsamjdk.compression_level=1 \
+			-jar /usr/gitc/picard.jar RevertSam \
+			INPUT=${input_bam} \
+			OUTPUT=${sample_id}.ubam \
+			SANITIZE=true \
+			ATTRIBUTE_TO_CLEAR=XT \
+			ATTRIBUTE_TO_CLEAR=XN \
+			ATTRIBUTE_TO_CLEAR=AS \
+			ATTRIBUTE_TO_CLEAR=OC \
+			ATTRIBUTE_TO_CLEAR=OP \
+			SORT_ORDER=queryname \
+			RESTORE_ORIGINAL_QUALITIES=true \
+			REMOVE_DUPLICATE_INFORMATION=true \
+			REMOVE_ALIGNMENT_INFORMATION=true \
+			MAX_DISCARD_FRACTION=1.0
+	>>>
+
+	output {
+		File ubam = "${sample_id}.ubam"
+	}
+
+	runtime {
+		docker: "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817"
+		memory: "${memory_gb} GB"
+		cpu: "1"
+		disks: "local-disk ${diskspace_gb} HDD"
+		preemptible: preemptible_tries
+	}
+}

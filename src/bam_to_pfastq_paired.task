@@ -1,4 +1,6 @@
-task bam_to_fastq_paired_fast {
+# Extract reads from query-name-sorted BAM file
+# and produce an paired interleaved fastq file.
+task qnsbam_to_pfastq_paired {
 	File input_bam
 	String sample_id
 
@@ -6,22 +8,15 @@ task bam_to_fastq_paired_fast {
 	Int memory_gb
 	Int preemptible_tries
 
-	Int memory_mb_thread = floor(0.5 * memory_gb * 1024 / cpu)
-	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
+	Int diskspace_gb = ceil(5 * size(input_bam, "GB"))
 
 	command <<<
 		set -eu
 
-		# sort the BAM file by qname (read name)
-		# s.t. downstream insert size calculation is not biased
-		samtools sort -@ ${cpu} -m ${memory_mb_thread}M -n -l l -o qname-sorted.bam ${input_bam}
-		rm ${input_bam}
-
 		# extract reads from the BAM file and write to fifo
 		# NB will *not* work if the BAM file have unpaired reads that are not marked!
-		mkfifo r1.fastq
-		mkfifo r2.fastq
-		samtools fastq qname-sorted.bam \
+		mkfifo r1.fastq r2.fastq
+		samtools fastq ${input_bam} \
 			-0 ${sample_id}_unpaired.fastq \
 			-1 r1.fastq \
 			-2 r2.fastq \

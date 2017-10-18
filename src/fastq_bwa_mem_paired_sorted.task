@@ -1,4 +1,6 @@
-task bwa_mem_paired {
+# Align reads from a pair of fastq files using bwa mem
+# and produce an aligned, duplicate-marked, sorted, and indexed BAM file.
+task fastq_bwa_mem_paired_sorted {
 
 	File ref_fasta
 	# NB  64-bit bwa index files should be used
@@ -18,7 +20,7 @@ task bwa_mem_paired {
 	Int preemptible_tries
 
 	Int memory_mb_thread = floor(0.5 * memory_gb * 1024 / cpu)
-	Int diskspace_gb = ceil(5 * (size(fastq_r1, "GB") + size(fastq_r2, "GB")))
+	Int diskspace_gb = ceil(4 * (size(fastq_r1, "GB") + size(fastq_r2, "GB")))
 
 	command <<<
 		set -eu

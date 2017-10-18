@@ -1,17 +1,25 @@
-include bam_to_fastq_paired_fast.task
-include bwa_mem_paired_fast.task
+include bam_to_fastq_paired.task
+include fastq_bwa_mem_paired.task
+include bam_sort_coord.task
 
 workflow bam_realign_paired_fast {
 	String sample_id
 
-	call bam_to_fastq_paired_fast {
+	call bam_to_fastq_paired {
 		input:
 			sample_id = sample_id
 	}
 
-	call bwa_mem_paired_fast {
+	call fastq_bwa_mem_paired {
 		input:
-			fastq_r1_r2 = bam_to_fastq_paired_fast.fastq_r1_r2,
 			sample_id = sample_id
+			fastq_r1 = bam_to_fastq_paired.fastq_r1
+			fastq_r2 = bam_to_fastq_paired.fastq_r2
+	}
+
+	call bam_sort_coord {
+		input:
+			sample_id = sample_id
+			input_bam = fastq_mem_paired.bam
 	}
 }
