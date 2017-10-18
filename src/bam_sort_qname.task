@@ -17,7 +17,7 @@ task bam_sort_qname {
 	Int memory_mb_thread = floor(0.5 * memory_gb * 1024 / cpu)
 	# A lot of diskspace is required for external sorting,
 	# because the data is too big to fit in RAM
-	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
+	Int diskspace_gb = ceil(12 * size(input_bam, "GB"))
 
 	command <<<
 		set -eu
