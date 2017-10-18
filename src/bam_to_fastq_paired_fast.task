@@ -6,7 +6,7 @@ task bam_to_fastq_paired_fast {
 	Int memory_gb
 	Int preemptible_tries
 
-	Int memory_mb_thread = floor(0.8 * memory_gb * 1024 / cpu)
+	Int memory_mb_thread = floor(0.5 * memory_gb * 1024 / cpu)
 	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
 
 	command <<<
