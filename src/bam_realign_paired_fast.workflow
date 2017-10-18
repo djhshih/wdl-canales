@@ -12,14 +12,14 @@ workflow bam_realign_paired_fast {
 
 	call fastq_bwa_mem_paired {
 		input:
-			sample_id = sample_id
-			fastq_r1 = bam_to_fastq_paired.fastq_r1
+			sample_id = sample_id,
+			fastq_r1 = bam_to_fastq_paired.fastq_r1,
 			fastq_r2 = bam_to_fastq_paired.fastq_r2
 	}
 
 	call bam_sort_coord {
 		input:
-			sample_id = sample_id
+			sample_id = sample_id,
 			input_bam = fastq_mem_paired.bam
 	}
 }
