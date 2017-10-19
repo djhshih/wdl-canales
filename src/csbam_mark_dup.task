@@ -1,0 +1,38 @@
+# Mark duplicate reads in a coordinate-sorted bam file.
+task csbam_mark_dup {
+	File input_bam
+
+	Int memory_gb
+	Int preemptible_tries
+
+	Int diskspace_gb = ceil(4 * size(input_bam, "GB"))
+
+	command <<<
+		set -eu
+		
+		# input bam must be coordinate sorted
+		java -jar /usr/gitc/picard.jar MarkDuplicates \
+			INPUT=${input_bam} \
+			OUTPUT=${sample_id}.bam \
+			METRICS_FILE=${sample_id}_picard-mark-dup_metrics.txt \
+			CREATE_INDEX=true \
+			VALIDATION_STRINGENCY=SILENT \
+			OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
+			TMP_DIR=./tmp
+	>>>
+
+	output {
+		File bam = "${sample_id}.bam"
+		File bai = "${sample_id}.bai"
+		File markdup_metrics = "${sample_id}_picard-mark-dup_metrics.txt"
+	}
+
+	runtime {
+		docker: "broadinstitute/genomes-in-the-cloud:2.3.1-1500064817"
+		memory: "${memory_gb} GB"
+		cpu: "1"
+		disks: "local-disk ${diskspace_gb} HDD"
+		preemptible: preemptible_tries
+	}
+
+}
