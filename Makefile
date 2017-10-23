@@ -20,5 +20,6 @@ bin/cromwell:
 	DESTDIR=. bin/install-cromwell.sh
 
 check: $(targets) bin/cromwell
-	for f in $^; do $(check) $$f test; done
+	bin/cromwell
+	#for f in $^; do $(check) $$f test; done
 
