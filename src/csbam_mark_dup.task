@@ -1,6 +1,7 @@
 # Mark duplicate reads in a coordinate-sorted bam file.
 task csbam_mark_dup {
 	File input_bam
+	String sample_id
 
 	Int memory_gb
 	Int preemptible_tries
