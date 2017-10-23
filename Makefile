@@ -21,5 +21,6 @@ bin/cromwell:
 
 check: $(targets) bin/cromwell
 	bin/cromwell
+	docker run djhshih/seqkit:0.1 samtools
 	#for f in $^; do $(check) $$f test; done
 
