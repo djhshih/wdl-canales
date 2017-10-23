@@ -23,7 +23,7 @@ task qnsbam_to_pfastq_paired {
 			&
 
 		# consume reads from fifos and create interleaved fastq
-		pairfq r1.fastq r2.fastq /dev/stdout ${sample_id}_unpaired_unmarked.fastq \
+		pairfq r1.fastq r2.fastq /dev/stdout natural ${sample_id}_unpaired_unmarked.fastq \
 			| gzip > ${sample_id}_R1_R2.fastq.gz
 		rm r1.fastq r2.fastq
 

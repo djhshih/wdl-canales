@@ -29,7 +29,6 @@ task ubam_bwa_mem_paired {
 		fi
 
 		# extract reads from the BAM file and write to fifo
-		# NB will *not* work if the BAM file have unpaired reads that are not marked!
 		mkfifo r1.fastq r2.fastq
 		samtools fastq ${input_ubam} \
 			-0 marked-unpaired.fastq \
@@ -42,7 +41,7 @@ task ubam_bwa_mem_paired {
 		# difference in duplicate marking between samblaster and Picard:
 		#  the first encountered read-pair of a duplicate set will considered as the 
 		#  prototype instead of the 'best' read-pair
-		pairfq r1.fastq r2.fastq /dev/stdout unmarked-unpaired.fastq \
+		pairfq r1.fastq r2.fastq /dev/stdout lexical unmarked-unpaired.fastq \
 			| bwa mem -Y -t ${cpu} ${ref_fasta} -p - \
 			| samblaster | samtools view -b1 - \
 			> ${sample_id}_aligned.bam
