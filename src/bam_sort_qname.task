@@ -14,17 +14,18 @@ task bam_sort_qname {
 	Int memory_gb
 	Int preemptible_tries
 
-	Int memory_mb_thread = floor(0.5 * memory_gb * 1024 / cpu)
+	Int memory_mb_sort = floor(0.8 * memory_gb * 1024 / cpu)
 	# A lot of diskspace is required for external sorting,
 	# because the data is too big to fit in RAM
-	Int diskspace_gb = ceil(15 * size(input_bam, "GB"))
+	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
 
 	command <<<
 		set -eu
 		
 		# reads should be be sorted by genomic location in order to avoid bias in
 		# insert size calculation during alignment; thus, sort by read name
-		samtools sort -@ ${cpu} -m ${memory_mb_thread}M -n -l l -o ${sample_id}_qnsorted.bam ${input_bam}
+		sambamba sort -t ${cpu} -m ${memory_mb_sort}M --tmpdir ./tmp -l l -N \
+			-o ${sample_id}_qnsorted.bam ${input_bam}
 
 		# since this query name sorted BAM file is meant for immediate consumption
 		# downstream, we will not make an index for it

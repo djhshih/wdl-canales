@@ -13,17 +13,17 @@ task bam_sort_coord {
 	Int memory_gb
 	Int preemptible_tries
 
-	Int memory_mb_thread = floor(0.5 * memory_gb * 1024 / cpu)
-	Int diskspace_gb = ceil(15 * size(input_bam, "GB"))
+	Int memory_mb_sort = floor(0.8 * memory_gb * 1024)
+	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
 
 	command <<<
 		set -eu
 		
 		# sort alignments with ample RAM to avoid disk IO and create final bam file
-		samtools sort -@ ${cpu} -m ${memory_mb_thread}M -o ${sample_id}.bam ${input_bam}
+		sambamba sort -t ${cpu} -m ${memory_mb_sort}M --tmpdir ./tmp \
+			-o ${sample_id}.bam ${input_bam}
 
-		# index the bam file
-		samtools index ${sample_id}.bam ${sample_id}.bai
+		mv ${sample_id}.bam.bai ${sample_id}.bai
 	>>>
 
 	output {
