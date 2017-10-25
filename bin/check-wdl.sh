@@ -3,6 +3,7 @@
 set -eu
 
 path="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+root="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/.. && pwd )"
 
 wdl=$1
 indir=$2
@@ -16,6 +17,7 @@ if [[ $wdl =~ .*\.wdl ]]; then
 
 	inputs=$indir/${wdl_wname}.inputs
 
-	$path/cromwell run $wdl -i $inputs
+	$path/cromwell run $wdl -i <(sed -e "s|\${root}|${root}|g" $inputs)
 
 fi
+
