@@ -1,0 +1,20 @@
+{
+  "bam_realign_paired.sample_id": "sample",
+  "bam_realign_paired.bam_to_fastq_paired.input_bam": "${root}/test/sample.bam",
+  "bam_realign_paired.bam_to_fastq_paired.memory_gb": 1,
+  "bam_realign_paired.bam_to_fastq_paired.preemptible_tries": 5,
+  "bam_realign_paired.fastq_bwa_mem_paired.ref_fasta": "${root}/test/tp53.fasta",
+  "bam_realign_paired.fastq_bwa_mem_paired.ref_fasta_amb": "${root}/test/tp53.fasta.amb",
+  "bam_realign_paired.fastq_bwa_mem_paired.ref_fasta_ann": "${root}/test/tp53.fasta.ann",
+  "bam_realign_paired.fastq_bwa_mem_paired.ref_fasta_bwt": "${root}/test/tp53.fasta.bwt",
+  "bam_realign_paired.fastq_bwa_mem_paired.ref_fasta_pac": "${root}/test/tp53.fasta.pac",
+  "bam_realign_paired.fastq_bwa_mem_paired.ref_fasta_sa": "${root}/test/tp53.fasta.sa",
+  "bam_realign_paired.fastq_bwa_mem_paired.cpu": 2,
+  "bam_realign_paired.fastq_bwa_mem_paired.memory_gb": 1,
+  "bam_realign_paired.fastq_bwa_mem_paired.preemptible_tries": 5,
+  "bam_realign_paired.csbam_mark_dup.memory_gb": 1,
+  "bam_realign_paired.csbam_mark_dup.preemptible_tries": 5,
+  "bam_realign_paired.bam_sort_coord.cpu": 2,
+  "bam_realign_paired.bam_sort_coord.memory_gb": 1,
+  "bam_realign_paired.bam_sort_coord.preemptible_tries": 5
+}

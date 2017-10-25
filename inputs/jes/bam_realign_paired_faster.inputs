@@ -1,0 +1,18 @@
+{
+  "bam_realign_paired_faster.sample_id": "sample",
+  "bam_realign_paired_faster.bam_to_ubam.input_bam": "${root}/test/sample.bam",
+  "bam_realign_paired_faster.bam_to_ubam.memory_gb": 1,
+	"bam_realign_paired_faster.bam_to_ubam.preemptible_tries": 5,
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.ref_fasta": "${root}/tp53.fasta",
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.ref_fasta_amb": "${root}/tp53.fasta.amb",
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.ref_fasta_ann": "${root}/tp53.fasta.ann",
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.ref_fasta_bwt": "${root}/tp53.fasta.bwt",
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.ref_fasta_pac": "${root}/tp53.fasta.pac",
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.ref_fasta_sa": "${root}/tp53.fasta.sa",
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.cpu": 2,
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.memory_gb": 1,
+  "bam_realign_paired_faster.ubam_bwa_mem_paired.preemptible_tries": 5,
+  "bam_realign_paired_faster.bam_sort_coord.cpu": 2,
+  "bam_realign_paired_faster.bam_sort_coord.memory_gb": 1,
+  "bam_realign_paired_faster.bam_sort_coord.preemptible_tries": 5
+}
