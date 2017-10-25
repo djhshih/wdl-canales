@@ -19,8 +19,9 @@ clean:
 bin/cromwell:
 	DESTDIR=. bin/install-cromwell.sh
 
-check: $(targets) bin/cromwell
-	bin/cromwell
-	docker run djhshih/seqkit:0.1 samtools
-	#for f in $^; do $(check) $$f test; done
+test/sample.bam:
+	test/make.sh
+
+check: $(targets) bin/cromwell test/sample.bam
+	for f in $^; do $(check) $$f test/inputs/jes; done
 
