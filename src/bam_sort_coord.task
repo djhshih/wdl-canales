@@ -14,7 +14,7 @@ task bam_sort_coord {
 	Int preemptible_tries
 
 	Int memory_mb_sort = floor(0.8 * memory_gb * 1024)
-	Int diskspace_gb = ceil(10 * size(input_bam, "GB"))
+	Int diskspace_gb = ceil(6 * size(input_bam, "GB"))
 
 	command <<<
 		set -eu
