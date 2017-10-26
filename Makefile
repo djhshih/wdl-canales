@@ -1,5 +1,6 @@
 build = ./bin/wdl-assemble.py
 check = ./bin/check-wdl.sh 
+check_rc = ./bin/check-rc.sh
 
 targets = \
 	wdl/bam_realign_paired.wdl \
@@ -26,5 +27,5 @@ test/S01.bam:
 
 check: $(targets) bin/cromwell test/S01.bam
 	for f in $^; do $(check) $$f test/inputs/jes; done
-	find cromwell-executions -name rc | xargs cat
+	$(check_rc) cromwell-executions
 
