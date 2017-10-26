@@ -25,7 +25,8 @@ Requirements:
 - java (jre8)
 - docker
 
-The workflows can be run on pre-generated test data by
+The workflows can be run on pre-generated test data using cromwell
+(automatically retrieved).
 
 ```
 make check
