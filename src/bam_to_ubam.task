@@ -1,6 +1,7 @@
 # Convert BAM file into unaligned BAM file
 # where the reads are sorted by name.
 task bam_to_ubam {
+	# input bam file of pair-end reads; must have @RG information
 	File input_bam
 	String sample_id
 
