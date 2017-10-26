@@ -20,7 +20,8 @@ ref=$(pwd)/ref/tp53.fasta
 
 bwa index -a bwtsw $ref
 
-tmpdir=$(mktemp -d ./tmp.XXXXXX) && cd $tmpdir && echo $tmpdir
+mkdir -p tmp
+tmpdir=$(mktemp -d ./tmp/XXXXXX) && cd $tmpdir && echo $tmpdir
 
 nreads=100
 lanes=(L01 L02)
