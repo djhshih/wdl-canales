@@ -19,9 +19,9 @@ clean:
 bin/cromwell:
 	DESTDIR=. bin/install-cromwell.sh
 
-test/sample.bam:
+test/S01.bam:
 	test/make.sh
 
-check: $(targets) bin/cromwell test/sample.bam
+check: $(targets) bin/cromwell test/S01.bam
 	for f in $^; do $(check) $$f test/inputs/jes; done
 
