@@ -15,6 +15,8 @@ wdl/%.wdl: src/%.workflow
 
 clean:
 	rm -rf wdl/*
+	rm -rf cromwell-*/
+	rm -rf tmp
 
 bin/cromwell:
 	DESTDIR=. bin/install-cromwell.sh
@@ -24,4 +26,5 @@ test/S01.bam:
 
 check: $(targets) bin/cromwell test/S01.bam
 	for f in $^; do $(check) $$f test/inputs/jes; done
+	find cromwell-executions -name rc | xargs cat
 
