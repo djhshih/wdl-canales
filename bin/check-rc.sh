@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check all return code files in a directory
+
+set -o errexit
+set -o nounset
+
+
 root=$1
 
 final_rc=0
@@ -19,3 +25,4 @@ else
 fi
 
 exit $final_rc
+
