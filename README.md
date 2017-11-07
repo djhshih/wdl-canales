@@ -19,6 +19,14 @@ make
 Now, WDL files can be found in `wdl/`.
 
 
+## Run the workflows
+
+The workflows can be run using [Cromwell](https://github.com/broadinstitute/cromwell) (command line) or [Firecloud](http://firecloud.org) (web service hosted on the Google Cloud platform).
+See their respective documentations for further details.
+
+The workflows here are also released under the `dshih` namespace on Firecloud.
+
+
 ## Test the workflows
 
 Requirements:
@@ -48,3 +56,9 @@ cd test
 ./make.sh
 ```
 
+## Workflows
+
+Extract reads from pair-end BAM and re-align to another reference:
+- *bam_realign_paired*
+- *bam_realign_paired_fast*
+- *bam_realign_paired_faster*
