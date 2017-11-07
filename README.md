@@ -29,17 +29,19 @@ The workflows here are also released under the `dshih` namespace on Firecloud.
 
 ## Test the workflows
 
-Requirements:
+The workflows are continuously tested on pre-generated test data on [Travis](https://travis-ci.org/djhshih/wdl-canales).
+
+To run these tests yourself, you need to first fulfill the following requirements:
 - java (jre8)
 - docker
 
-The workflows can be run on pre-generated test data by
+Then, you can simply do
 
 ```
 make check
 ```
 
-The exit codes of all tasks are printed to `stdout`.
+The exit codes of each task is printed to `stdout`.
 
 
 ## Generate test data
