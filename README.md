@@ -19,20 +19,30 @@ make
 Now, WDL files can be found in `wdl/`.
 
 
+## Run the workflows
+
+The workflows can be run using [Cromwell](https://github.com/broadinstitute/cromwell) (command line) or [Firecloud](http://firecloud.org) (web service hosted on the Google Cloud platform).
+See their respective documentations for further details.
+
+The workflows here are also released under the `dshih` namespace on Firecloud.
+
+
 ## Test the workflows
 
-Requirements:
+The workflows are continuously tested on pre-generated test data on [Travis](https://travis-ci.org/djhshih/wdl-canales).
+
+To run these tests yourself, you need to first fulfill the following requirements:
 - java (jre8)
 - docker
 
 The workflows can be run on pre-generated test data using cromwell
-(automatically retrieved).
+(automatically retrieved). Simply do
 
 ```
 make check
 ```
 
-The exit codes of all tasks are printed to `stdout`.
+The exit codes of each task is printed to `stdout`.
 
 
 ## Generate test data
@@ -49,3 +59,9 @@ cd test
 ./make.sh
 ```
 
+## Workflows
+
+Extract reads from pair-end BAM and re-align to another reference:
+- *bam_realign_paired*
+- *bam_realign_paired_fast*
+- *bam_realign_paired_faster*
