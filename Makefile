@@ -6,6 +6,7 @@ targets = \
 	wdl/bam_realign_paired.wdl \
 	wdl/bam_realign_paired_fast.wdl \
 	wdl/bam_realign_paired_faster.wdl \
+	wdl/maf_filter_orient_bias_legacy.wdl \
 
 
 all: $(targets)

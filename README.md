@@ -65,3 +65,7 @@ Extract reads from pair-end BAM and re-align to another reference:
 - *bam_realign_paired*
 - *bam_realign_paired_fast*
 - *bam_realign_paired_faster*
+
+Filter out OxoG and FFPE artifacts from SNVs:
+- *maf_filter_orient_bias_legacy*
+
