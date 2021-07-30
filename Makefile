@@ -3,6 +3,7 @@ check = ./bin/check-wdl.sh
 check_rc = ./bin/check-rc.sh
 
 targets = \
+	wdl/fastq_align_paired.wdl \
 	wdl/bam_realign_paired.wdl \
 	wdl/bam_realign_paired_fast.wdl \
 	wdl/bam_realign_paired_faster.wdl \

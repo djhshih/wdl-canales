@@ -61,6 +61,9 @@ cd test
 
 ## Workflows
 
+Align reads from pair-end FASTQ:
+- *fastq_align_paired*
+
 Extract reads from pair-end BAM and re-align to another reference:
 - *bam_realign_paired*
 - *bam_realign_paired_fast*
