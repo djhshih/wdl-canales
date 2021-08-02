@@ -29,4 +29,10 @@ workflow bam_realign_paired {
 			sample_id = sample_id,
 			input_bam = bam_sort_coord.bam
 	}
+
+	output {
+		File bam = csbam_mark_dup.bam
+		File bai = csbam_mark_dup.bai
+		File markdup_metrics = csbam_mark_dup.markdup_metrics
+	}
 }

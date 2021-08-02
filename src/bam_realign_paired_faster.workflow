@@ -21,4 +21,9 @@ workflow bam_realign_paired_faster {
 			sample_id = sample_id,
 			input_bam = ubam_bwa_mem_paired.bam
 	}
+
+	output {
+		File bam = bam_sort_coord.bam
+		File bai = bam_sort_coord.bai
+	}
 }
