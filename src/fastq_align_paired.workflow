@@ -1,10 +1,10 @@
-include fastq_bwa_mem_paired.task
+include fastq_bwa_mem_paired_mult.task
 include bam_sort_coord.task
 
 workflow fastq_align_paired {
 	String sample_id
 
-	call fastq_bwa_mem_paired_mult {
+	call fastq_bwa_mem_paired {
 		input:
 			sample_id = sample_id
 	}
