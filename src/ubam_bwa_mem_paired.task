@@ -21,7 +21,7 @@ task ubam_bwa_mem_paired {
 	Int diskspace_gb = ceil(4 * size(input_ubam, "GB"))
 
 	command <<<
-		set -eu
+		set -euo pipefail
 		
 		if [[ ! -f ${ref_fasta_sa} ]]; then
 			# index the reference fasta if it is missing
