@@ -11,7 +11,7 @@ task qnsbam_to_pfastq_paired {
 	Int diskspace_gb = ceil(5 * size(input_bam, "GB"))
 
 	command <<<
-		set -eu
+		set -euo pipefail
 
 		# extract reads from the BAM file and write to fifo
 		# NB will *not* work if the BAM file have unpaired reads that are not marked!
