@@ -17,7 +17,7 @@ task bam_sort_coord {
 	Int diskspace_gb = ceil(6 * size(input_bam, "GB"))
 
 	command <<<
-		set -eu
+		set -euo pipefail
 		
 		# sort alignments with ample RAM to avoid disk IO and create final bam file
 		sambamba sort -t ${cpu} -m ${memory_mb_sort}M --tmpdir ./tmp \
