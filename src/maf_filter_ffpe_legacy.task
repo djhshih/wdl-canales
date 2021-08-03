@@ -15,7 +15,7 @@ task maf_filter_ffpe_legacy {
 	Int diskspace_gb = ceil(2 * size(input_bam, "GB"))
 
 	command <<<
-		set -eu
+		set -euo pipefail
 		
 		ffpe-filter.sh ${sample_id} ${input_bam} ${input_maf} ${ref_fasta} null .
 	>>>
