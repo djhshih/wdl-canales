@@ -24,7 +24,7 @@ task fastq_bwa_mem_paired {
 	Int diskspace_gb = ceil(4 * (size(fastqs_r1[0], "GB") + size(fastqs_r2[0], "GB")) * length(fastqs_r1))
 
 	command <<<
-		set -eu
+		set -euo pipefail
 		
 		if [[ ! -f ${ref_fasta_sa} ]]; then
 			#	index the reference fasta if it is missing
