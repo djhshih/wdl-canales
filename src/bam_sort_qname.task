@@ -21,7 +21,7 @@ task bam_sort_qname {
 	Int diskspace_gb = ceil(8 * size(input_bam, "GB"))
 
 	command <<<
-		set -eu
+		set -euo pipefail
 		
 		# reads should be be sorted by genomic location in order to avoid bias in
 		# insert size calculation during alignment; thus, sort by read name
