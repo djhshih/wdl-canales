@@ -12,7 +12,7 @@ task bam_to_ubam {
 	Int preemptible_tries
 
 	command <<<
-		set -eu
+		set -euo pipefail
 
 		# discard alignment information and sort reads by name
 		# s.t. downstream insert size calculation is not biased
