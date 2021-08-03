@@ -9,7 +9,7 @@ task csbam_mark_dup {
 	Int diskspace_gb = ceil(4 * size(input_bam, "GB"))
 
 	command <<<
-		set -eu
+		set -euo pipefail
 		
 		# input bam must be coordinate sorted
 		java -jar /usr/gitc/picard.jar MarkDuplicates \
