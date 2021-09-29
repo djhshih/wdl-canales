@@ -1,0 +1,108 @@
+task counts_model_segments {
+    input {
+      String entity_id
+      File denoised_copy_ratios
+      File allelic_counts
+      File? normal_allelic_counts
+      Int? max_num_segments_per_chromosome
+      Int? min_total_allele_count
+      Int? min_total_allele_count_normal
+      Float? genotyping_homozygous_log_ratio_threshold
+      Float? genotyping_base_error_rate
+      Float? kernel_variance_copy_ratio
+      Float? kernel_variance_allele_fraction
+      Float? kernel_scaling_allele_fraction
+      Int? kernel_approximation_dimension
+      Array[Int]+? window_sizes = [8, 16, 32, 64, 128, 256]
+      Float? num_changepoints_penalty_factor
+      Float? minor_allele_fraction_prior_alpha
+      Int? num_samples_copy_ratio
+      Int? num_burn_in_copy_ratio
+      Int? num_samples_allele_fraction
+      Int? num_burn_in_allele_fraction
+      Float? smoothing_threshold_copy_ratio
+      Float? smoothing_threshold_allele_fraction
+      Int? max_num_smoothing_iterations
+      Int? num_smoothing_iterations_per_fit
+      String? output_dir
+      File? gatk4_jar_override
+
+      # Runtime parameters
+      String gatk_docker
+      Int? mem_gb
+      Int? disk_space_gb
+      Boolean use_ssd = false
+      Int? cpu
+      Int? preemptible_attempts
+    }
+
+    Int machine_mem_mb = select_first([mem_gb, 13]) * 1000
+    # ModelSegments seems to need at least 3GB of overhead to run
+    Int command_mem_mb = machine_mem_mb - 3000
+
+    # If optional output_dir not specified, use "out"
+    String output_dir_ = select_first([output_dir, "out"])
+
+    # default values are min_total_allele_count_ = 0 in matched-normal mode
+    #                                            = 30 in case-only mode
+    Int default_min_total_allele_count = if defined(normal_allelic_counts) then 0 else 30
+    Int min_total_allele_count_ = select_first([min_total_allele_count, default_min_total_allele_count])
+
+    command <<<
+        set -e
+        export GATK_LOCAL_JAR=~{default="/root/gatk.jar" gatk4_jar_override}
+
+        gatk --java-options "-Xmx~{command_mem_mb}m -XX:+UseSerialGC" ModelSegments \
+            --denoised-copy-ratios ~{denoised_copy_ratios} \
+            --allelic-counts ~{allelic_counts} \
+            ~{"--normal-allelic-counts " + normal_allelic_counts} \
+            --minimum-total-allele-count-case ~{min_total_allele_count_} \
+            --minimum-total-allele-count-normal ~{default="30" min_total_allele_count_normal} \
+            --genotyping-homozygous-log-ratio-threshold ~{default="-10.0" genotyping_homozygous_log_ratio_threshold} \
+            --genotyping-base-error-rate ~{default="0.05" genotyping_base_error_rate} \
+            --maximum-number-of-segments-per-chromosome ~{default="1000" max_num_segments_per_chromosome} \
+            --kernel-variance-copy-ratio ~{default="0.0" kernel_variance_copy_ratio} \
+            --kernel-variance-allele-fraction ~{default="0.025" kernel_variance_allele_fraction} \
+            --kernel-scaling-allele-fraction ~{default="1.0" kernel_scaling_allele_fraction} \
+            --kernel-approximation-dimension ~{default="100" kernel_approximation_dimension} \
+            --window-size ~{sep=" --window-size " window_sizes} \
+            --number-of-changepoints-penalty-factor ~{default="1.0" num_changepoints_penalty_factor} \
+            --minor-allele-fraction-prior-alpha ~{default="25.0" minor_allele_fraction_prior_alpha} \
+            --number-of-samples-copy-ratio ~{default="100" num_samples_copy_ratio} \
+            --number-of-burn-in-samples-copy-ratio ~{default="50" num_burn_in_copy_ratio} \
+            --number-of-samples-allele-fraction ~{default="100" num_samples_allele_fraction} \
+            --number-of-burn-in-samples-allele-fraction ~{default="50" num_burn_in_allele_fraction} \
+            --smoothing-credible-interval-threshold-copy-ratio ~{default="2.0" smoothing_threshold_copy_ratio} \
+            --smoothing-credible-interval-threshold-allele-fraction ~{default="2.0" smoothing_threshold_allele_fraction} \
+            --maximum-number-of-smoothing-iterations ~{default="10" max_num_smoothing_iterations} \
+            --number-of-smoothing-iterations-per-fit ~{default="0" num_smoothing_iterations_per_fit} \
+            --output ~{output_dir_} \
+            --output-prefix ~{entity_id}
+
+        # We need to create the file even if the above command doesn't so we have something to delocalize
+        # If no file is created by the above task then it will copy out an empty file
+        touch ~{output_dir_}/~{entity_id}.hets.normal.tsv
+    >>>
+
+    runtime {
+        docker: "~{gatk_docker}"
+        memory: machine_mem_mb + " MB"
+        disks: "local-disk " + disk_space_gb + if use_ssd then " SSD" else " HDD"
+        cpu: select_first([cpu, 1])
+        preemptible: select_first([preemptible_attempts, 5])
+    }
+
+    output {
+        File het_allelic_counts = "~{output_dir_}/~{entity_id}.hets.tsv"
+        File normal_het_allelic_counts = "~{output_dir_}/~{entity_id}.hets.normal.tsv"
+        File copy_ratio_only_segments = "~{output_dir_}/~{entity_id}.cr.seg"
+        File copy_ratio_legacy_segments = "~{output_dir_}/~{entity_id}.cr.igv.seg"
+        File allele_fraction_legacy_segments = "~{output_dir_}/~{entity_id}.af.igv.seg"
+        File modeled_segments_begin = "~{output_dir_}/~{entity_id}.modelBegin.seg"
+        File copy_ratio_parameters_begin = "~{output_dir_}/~{entity_id}.modelBegin.cr.param"
+        File allele_fraction_parameters_begin = "~{output_dir_}/~{entity_id}.modelBegin.af.param"
+        File modeled_segments = "~{output_dir_}/~{entity_id}.modelFinal.seg"
+        File copy_ratio_parameters = "~{output_dir_}/~{entity_id}.modelFinal.cr.param"
+        File allele_fraction_parameters = "~{output_dir_}/~{entity_id}.modelFinal.af.param"
+    }
+}
