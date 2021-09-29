@@ -1,0 +1,54 @@
+task intervals_annotate_intervals {
+    input {
+      File intervals
+      File ref_fasta
+      File ref_fasta_fai
+      File ref_fasta_dict
+      File? mappability_track_bed
+      File? mappability_track_bed_idx
+      File? segmental_duplication_track_bed
+      File? segmental_duplication_track_bed_idx
+      Int? feature_query_lookahead
+      File? gatk4_jar_override
+
+      # Runtime parameters
+      String gatk_docker
+      Int? mem_gb
+      Int? disk_space_gb
+      Boolean use_ssd = false
+      Int? cpu
+      Int? preemptible_attempts
+    }
+
+    Int machine_mem_mb = select_first([mem_gb, 2]) * 1000
+    Int command_mem_mb = machine_mem_mb - 500
+    
+    # Determine output filename
+    String base_filename = basename(intervals, ".interval_list")
+
+    command <<<
+        set -eu
+        export GATK_LOCAL_JAR=~{default="/root/gatk.jar" gatk4_jar_override}
+
+        gatk --java-options "-Xmx~{command_mem_mb}m -XX:+UseSerialGC" AnnotateIntervals \
+            -L ~{intervals} \
+            --reference ~{ref_fasta} \
+            ~{"--mappability-track " + mappability_track_bed} \
+            ~{"--segmental-duplication-track " + segmental_duplication_track_bed} \
+            --feature-query-lookahead ~{default=1000000 feature_query_lookahead} \
+            --interval-merging-rule OVERLAPPING_ONLY \
+            --output ~{base_filename}.annotated.tsv
+    >>>
+
+    runtime {
+        docker: gatk_docker
+        memory: machine_mem_mb + " MB"
+        disks: "local-disk " + select_first([disk_space_gb, ceil(size(ref_fasta, "GB")) + 50]) + if use_ssd then " SSD" else " HDD"
+        cpu: select_first([cpu, 1])
+        preemptible: select_first([preemptible_attempts, 5])
+    }
+
+    output {
+        File annotated_intervals = "~{base_filename}.annotated.tsv"
+    }
+}
