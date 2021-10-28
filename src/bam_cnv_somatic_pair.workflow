@@ -43,12 +43,11 @@ include bam_collect_allelic_counts.task
 include counts_denoise_read_counts.task
 include counts_model_segments.task
 include copy_ratio_segments_call.task
-include denosied_copy_ratios_plot.task
-include denosied_copy_ratios_plot_modeled_segments.task
+include denoised_copy_ratios_plot.task
+include denoised_copy_ratios_plot_modeled_segments.task
 
 
 workflow bam_cnv_somatic_pair {
-
     input {
       ##################################
       #### required basic arguments ####
@@ -283,7 +282,7 @@ workflow bam_cnv_somatic_pair {
 
     # The F=files from other tasks are small enough to just combine into one disk variable and pass to the tumor plotting tasks
     Int plot_tumor_disk = ref_size + ceil(size(DenoiseReadCountsTumor.standardized_copy_ratios, "GB")) + ceil(size(DenoiseReadCountsTumor.denoised_copy_ratios, "GB")) + ceil(size(ModelSegmentsTumor.het_allelic_counts, "GB")) + ceil(size(ModelSegmentsTumor.modeled_segments, "GB")) + disk_pad
-    call denosied_copy_ratios_plot as PlotDenoisedCopyRatiosTumor {
+    call denoised_copy_ratios_plot as PlotDenoisedCopyRatiosTumor {
         input:
             entity_id = CollectCountsTumor.entity_id,
             standardized_copy_ratios = DenoiseReadCountsTumor.standardized_copy_ratios,
@@ -299,7 +298,7 @@ workflow bam_cnv_somatic_pair {
             preemptible_attempts = preemptible_attempts
     }
 
-    call denosied_copy_ratios_plot_modeled_segments as PlotModeledSegmentsTumor {
+    call denoised_copy_ratios_plot_modeled_segments as PlotModeledSegmentsTumor {
         input:
             entity_id = CollectCountsTumor.entity_id,
             denoised_copy_ratios = DenoiseReadCountsTumor.denoised_copy_ratios,
@@ -419,7 +418,7 @@ workflow bam_cnv_somatic_pair {
 
         # The files from other tasks are small enough to just combine into one disk variable and pass to the normal plotting tasks
         Int plot_normal_disk = ref_size + ceil(size(DenoiseReadCountsNormal.standardized_copy_ratios, "GB")) + ceil(size(DenoiseReadCountsNormal.denoised_copy_ratios, "GB")) + ceil(size(ModelSegmentsNormal.het_allelic_counts, "GB")) + ceil(size(ModelSegmentsNormal.modeled_segments, "GB")) + disk_pad
-        call denosied_copy_ratios_plot as PlotDenoisedCopyRatiosNormal {
+        call denoised_copy_ratios_plot as PlotDenoisedCopyRatiosNormal {
             input:
                 entity_id = CollectCountsNormal.entity_id,
                 standardized_copy_ratios = DenoiseReadCountsNormal.standardized_copy_ratios,
@@ -435,7 +434,7 @@ workflow bam_cnv_somatic_pair {
                 preemptible_attempts = preemptible_attempts
         }
 
-        call denosied_copy_ratios_plot_modeled_segments as PlotModeledSegmentsNormal {
+        call denoised_copy_ratios_plot_modeled_segments as PlotModeledSegmentsNormal {
             input:
                 entity_id = CollectCountsNormal.entity_id,
                 denoised_copy_ratios = DenoiseReadCountsNormal.denoised_copy_ratios,
