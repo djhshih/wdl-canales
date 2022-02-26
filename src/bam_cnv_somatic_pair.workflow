@@ -1,3 +1,5 @@
+version 1.0
+
 # Workflow for running the GATK CNV pipeline on a matched pair. Supports both WGS and WES.
 #
 # Notes:
@@ -34,8 +36,6 @@
 #       java -jar cromwell.jar run cnv_somatic_pair_workflow.wdl -i my_parameters.json
 #
 #############
-
-version 1.0
 
 include intervals_preprocess_intervals.task
 include bam_collect_counts.task

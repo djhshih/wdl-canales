@@ -1,3 +1,5 @@
+version 1.0
+
 # Workflow for creating a GATK CNV Panel of Normals given a list of normal samples. Supports both WGS and WES.
 #
 # Notes:
