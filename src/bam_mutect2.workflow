@@ -68,7 +68,7 @@ version 1.0
 ## pertaining to the included programs.
 
 include intervals_split.task
-include bam_m2.task
+include bam_mutect2.task
 include orientation_model_learn.task
 include bam_outs_merge.task
 include pileup_summaries_merge.task
