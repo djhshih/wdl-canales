@@ -14,7 +14,7 @@ argv = pr.parse_args()
 out = sys.stdout
 
 workflow_fpath = argv.workflow
-pattern = re.compile(r'^\s*include\s+([A-Za-z_/:,.]+)$')
+pattern = re.compile(r'^\s*include\s+([A-Za-z0-9_/:,.]+)$')
 
 with open(workflow_fpath) as inf:
     for line in inf:

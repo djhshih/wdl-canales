@@ -1,4 +1,4 @@
-task bam_m2 {
+task bam_mutect2 {
     input {
       File? intervals
       File ref_fasta
