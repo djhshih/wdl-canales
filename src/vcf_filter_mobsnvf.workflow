@@ -1,39 +1,41 @@
 include bam_phi_estimation.task
-include snv_ffpe_oxog_filter.task
-include snv_bh.task
+include snv_mobsnvf_filter.task
+include snv_fdr_filter.task
 include snv_to_vcf.task
 include vcf_variant_filter.task
 include vcf_select_variants.task
 
-workflow vcf_hts_mobsnvf {
+workflow vcf_filter_mobsnvf {
 	String sample_id
+	String damage_type
 	File bam
 
 	call bam_phi_estimation {
 		input:
 			sample_id = sample_id,
-			bam = bam
+			bam = bam,
+			damage_type = damage_type
 	}
 	
-	call snv_ffpe_oxog_filter {
+	call snv_mobsnvf_filter {
 		input: 
 			sample_id = sample_id,
 			bam = bam,
-			phi_json = bam_phi_estimation.phi
+			damage_type = damage_type,
+			phi_json = bam_phi_estimation.phi_json
 	}
 
-	call snv_bh {
+	call snv_fdr_filter {
 		input:
 			sample_id = sample_id,
-			input_snv = snv_ffpe_oxog_filter.filtered_snv
+			snv = snv_mobsnvf_filter.annotated_snv
 	}
 
 	call snv_to_vcf {
 		input:
 			sample_id = sample_id,
-			input_snv = snv_bh.ffpe_mask_snv
+			snv = snv_fdr_filter.failed_snv
 	}
-
 
 	call vcf_variant_filter {
 		input:
