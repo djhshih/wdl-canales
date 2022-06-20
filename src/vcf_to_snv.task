@@ -1,0 +1,11 @@
+task vcf_to_snv {
+	input{
+		File vcf
+		String sample_id
+	}
+
+	command <<<
+		printf '#chrom\tpos\tref\talt\n' > ${sample_id}_selected.snv
+		grep -v vcf | cut -f -2,4,5 >> ${sample_id}_selected.snv
+	>>>
+}

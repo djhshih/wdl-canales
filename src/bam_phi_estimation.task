@@ -1,18 +1,20 @@
 task bam_phi_estimation {
 	File bam
 	File ref
+	
 	String sample_id
+	String damage_type
 
 	Int memory_gb
 	Int cpu
 
 	command <<<
-		hts-mobsnvf quantify -M freq -t ffpe \
-		-f ${ref} -b ${bam} -J ffpe_obquant_json 
+		hts-mobsnvf quantify -M freq -t ${damage_type} \
+		-f ${ref} -b ${bam} -J ${damage_type}_obquant.json 
 	>>>
 
 	output {
-		File phi = "ffpe_obquant_json"
+		File phi_json = "${damage}_obquant.json"
 	}
 	
 	runtime {

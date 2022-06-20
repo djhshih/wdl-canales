@@ -1,0 +1,27 @@
+task snv_to_vcf {
+	File snv
+	File vcf_header
+	
+	String out_name
+	
+	Int memory_gb
+	Int cpu
+
+	command <<<
+		cat ${vcf_header} > ${out_name}.vcf
+		paste -d'\t' <(cut -f 1-2 ${input_snv} | sed 's/$/\t./') \
+			<(cut -f 3-4 ${input_snv} | sed 's/$/\t.\tartifact\t./') >> ${out_name}.vcf
+		gatk IndexFeatureFile -I ${out_name}.vcf -O ${out_name}.vcf.idx
+	>>>
+
+	output {
+		File vcf = "${out_name}.vcf"
+		File vcf_idx = "${out_name}.vcf.idx"
+	}
+
+	runtime {
+		memory: "${memory_gb} GB"
+		cpu: "${cpu}"
+	}
+
+}
