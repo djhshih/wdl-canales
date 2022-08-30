@@ -126,7 +126,6 @@ workflow vcf_funcotaor {
                 runtime_params = standard_runtime,
                 disk_space = ceil(size(funcotate_vcf_input, "GB") * large_input_to_output_multiplier)  + funco_tar_size + disk_pad
         }
-    }
 	output {
         	File? funcotated_file = vcf_funcotator.funcotated_output_file
         	File? funcotated_file_index = vcf_funcotator.funcotated_output_file_index
