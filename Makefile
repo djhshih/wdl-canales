@@ -13,6 +13,7 @@ targets = \
 	wdl/bam_mobsnvf_ffpe.wdl \
 	wdl/bam_mutect2.wdl \
 	wdl/vcf_variant_curation.wdl \
+	wdl/vcf_funcotator.wdl \
 
 all: $(targets)
 	
