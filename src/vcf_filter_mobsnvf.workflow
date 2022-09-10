@@ -2,7 +2,7 @@ include bam_phi_estimation.task
 include snv_mobsnvf_filter.task
 include snv_fdr_filter.task
 include snv_to_vcf.task
-include vcf_variant_filter.task
+include vcf_mask_variants.task
 include vcf_select_variants.task
 
 workflow vcf_filter_mobsnvf {
@@ -37,7 +37,7 @@ workflow vcf_filter_mobsnvf {
 			snv = snv_fdr_filter.failed_snv
 	}
 
-	call vcf_variant_filter {
+	call vcf_mask_variants {
 		input:
 			sample_id = sample_id,
 			mask_vcf = snv_to_vcf.ffpe_mask_vcf,
@@ -47,13 +47,13 @@ workflow vcf_filter_mobsnvf {
 	call vcf_select_variants {
 		input:
 			sample_id = sample_id,
-			input_vcf = vcf_variant_filter.masked_vcf, 
-			input_vcf_index = vcf_variant_filter.masked_vcf_index 
+			input_vcf = vcf_mask_variants.masked_vcf, 
+			input_vcf_index = vcf_mask_variants.masked_vcf_index 
 	}
 
 	output {
-		File ffpe_masked_vcf = vcf_variant_filter.masked_vcf
-		File ffpe_masked_vcf_index = vcf_variant_filter.masked_vcf_index
+		File ffpe_masked_vcf = vcf_mask_variants.masked_vcf
+		File ffpe_masked_vcf_index = vcf_mask_variants.masked_vcf_index
 		File ffpe_selected_vcf = vcf_select_variants.selected_vcf 
 		File ffpe_selected_vcf_index = vcf_select_variants.selected_vcf_index
 	}
