@@ -1,6 +1,6 @@
 task vcf_select_variants {
-	File input_vcf
-	File input_vcf_index
+	File vcf
+	File vcf_index
 	String sample_id
 
 	Int memory_gb
@@ -8,7 +8,7 @@ task vcf_select_variants {
 
 	command <<<
 		gatk SelectVariants \
-		-V ${input_vcf} \
+		-V ${vcf} \
 		--exclude-filtered \
 		-O ${sample_id}_selected.vcf
 	>>>

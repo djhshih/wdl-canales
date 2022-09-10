@@ -10,9 +10,9 @@ targets = \
 	wdl/maf_filter_orient_bias_legacy.wdl \
 	wdl/bam_cnv_somatic_pair.wdl \
 	wdl/bam_cnv_somatic_panel.wdl \
-	wdl/bam_mobsnvf_ffpe.wdl \
+	wdl/vcf_filter_mobsnvf.wdl \
 	wdl/bam_mutect2.wdl \
-	wdl/vcf_variant_curation.wdl \
+	wdl/vcf_rm_variants.wdl \
 	wdl/vcf_funcotator.wdl \
 
 all: $(targets)

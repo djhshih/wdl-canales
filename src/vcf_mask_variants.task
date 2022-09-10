@@ -1,5 +1,5 @@
 task vcf_mask_variants {
-	File input_vcf
+	File vcf
 	File mask_vcf
 	File mask_vcf_index
 	String sample_id
@@ -9,7 +9,7 @@ task vcf_mask_variants {
 
 	command <<<
 		gatk VariantFiltration \
-		-V ${input_vcf} \
+		-V ${vcf} \
 		--invalidate-previous-filters true \
 		--mask ${mask_vcf} \
 		--mask-name "artifact" \
