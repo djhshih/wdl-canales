@@ -40,8 +40,8 @@ workflow vcf_filter_mobsnvf {
 	call vcf_mask_variants {
 		input:
 			sample_id = sample_id,
-			mask_vcf = snv_to_vcf.masked_vcf,
-			mask_vcf_index = snv_to_vcf.masked_vcf_idx
+			mask_vcf = snv_to_vcf.vcf,
+			mask_vcf_index = snv_to_vcf.vcf_idx
 	}
 
 	call vcf_select_variants {

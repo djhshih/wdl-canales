@@ -14,7 +14,7 @@ task bam_phi_estimation {
 	>>>
 
 	output {
-		File phi_json = "${damage}_obquant.json"
+		File phi_json = "${damage_type}_obquant.json"
 	}
 	
 	runtime {
