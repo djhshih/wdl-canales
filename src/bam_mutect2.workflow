@@ -74,7 +74,7 @@ include bam_outs_merge.task
 include pileup_summaries_merge.task
 include pileups_calculate_contamination.task
 include vcfs_merge.task
-include vcf_filter.task
+include vcf_filter_mutect2.task
 include stats_merge.task
 include vcf_funcotator.task
 include bam_alignment_artifacts_filter.task
@@ -297,7 +297,7 @@ workflow mutect2 {
         }
     }
 
-    call vcf_filter {
+    call vcf_filter_mutect2 {
         input:
             ref_fasta = ref_fasta,
             ref_fai = ref_fai,
@@ -328,16 +328,16 @@ workflow mutect2 {
                 realignment_extra_args = realignment_extra_args,
                 compress = compress,
                 output_name = filtered_name,
-                input_vcf = vcf_filter.filtered_vcf,
-                input_vcf_idx = vcf_filter.filtered_vcf_idx,
+                input_vcf = vcf_filter_mutect2.filtered_vcf,
+                input_vcf_idx = vcf_filter_mutect2.filtered_vcf_idx,
                 runtime_params = standard_runtime,
                 mem = filter_alignment_artifacts_mem
         }
     }
 
     if (run_funcotator_or_default) {
-        File funcotate_vcf_input = select_first([bam_alignment_artifacts_filter.filtered_vcf, vcf_filter.filtered_vcf])
-        File funcotate_vcf_input_index = select_first([bam_alignment_artifacts_filter.filtered_vcf_idx, vcf_filter.filtered_vcf_idx])
+        File funcotate_vcf_input = select_first([bam_alignment_artifacts_filter.filtered_vcf, vcf_filter_mutect2.filtered_vcf])
+        File funcotate_vcf_input_index = select_first([bam_alignment_artifacts_filter.filtered_vcf_idx, vcf_filter_mutect2.filtered_vcf_idx])
         call vcf_funcotator {
             input:
                 ref_fasta = ref_fasta,
@@ -368,9 +368,9 @@ workflow mutect2 {
     }
 
     output {
-        File filtered_vcf = select_first([bam_alignment_artifacts_filter.filtered_vcf, vcf_filter.filtered_vcf])
-        File filtered_vcf_idx = select_first([bam_alignment_artifacts_filter.filtered_vcf_idx, vcf_filter.filtered_vcf_idx])
-        File filtering_stats = vcf_filter.filtering_stats
+        File filtered_vcf = select_first([bam_alignment_artifacts_filter.filtered_vcf, vcf_filter_mutect2.filtered_vcf])
+        File filtered_vcf_idx = select_first([bam_alignment_artifacts_filter.filtered_vcf_idx, vcf_filter_mutect2.filtered_vcf_idx])
+        File filtering_stats = vcf_filter_mutect2.filtering_stats
         File mutect_stats = stats_merge.merged_stats
         File? contamination_table = pileups_calculate_contamination.contamination_table
 

@@ -1,4 +1,5 @@
-task vcf_filter {
+# filter Mutect2 calls
+task vcf_filter_mutect2 {
     input {
       File? intervals
       File ref_fasta
