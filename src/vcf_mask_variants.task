@@ -1,4 +1,4 @@
-task vcf_variant_filter {
+task vcf_mask_variants {
 	File input_vcf
 	File mask_vcf
 	File mask_vcf_index
