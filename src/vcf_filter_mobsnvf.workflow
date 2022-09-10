@@ -9,6 +9,7 @@ workflow vcf_filter_mobsnvf {
 	String sample_id
 	String damage_type
 	File bam
+	File vcf_header
 
 	call bam_phi_estimation {
 		input:
@@ -33,8 +34,9 @@ workflow vcf_filter_mobsnvf {
 
 	call snv_to_vcf {
 		input:
-			sample_id = sample_id,
-			snv = snv_fdr_filter.failed_snv
+			out_name = sample_id,
+			snv = snv_fdr_filter.failed_snv,
+			vcf_header = vcf_header
 	}
 
 	call vcf_mask_variants {
@@ -47,8 +49,8 @@ workflow vcf_filter_mobsnvf {
 	call vcf_select_variants {
 		input:
 			sample_id = sample_id,
-			input_vcf = vcf_mask_variants.masked_vcf, 
-			input_vcf_index = vcf_mask_variants.masked_vcf_index 
+			vcf = vcf_mask_variants.masked_vcf, 
+			vcf_index = vcf_mask_variants.masked_vcf_index 
 	}
 
 	output {

@@ -9,8 +9,8 @@ task snv_to_vcf {
 
 	command <<<
 		cat ${vcf_header} > ${out_name}.vcf
-		paste -d'\t' <(cut -f 1-2 ${input_snv} | sed 's/$/\t./') \
-			<(cut -f 3-4 ${input_snv} | sed 's/$/\t.\tartifact\t./') >> ${out_name}.vcf
+		paste -d'\t' <(cut -f 1-2 ${snv} | sed 's/$/\t./') \
+			<(cut -f 3-4 ${snv} | sed 's/$/\t.\tartifact\t./') >> ${out_name}.vcf
 		gatk IndexFeatureFile -I ${out_name}.vcf -O ${out_name}.vcf.idx
 	>>>
 
