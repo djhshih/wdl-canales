@@ -40,8 +40,8 @@ workflow vcf_filter_mobsnvf {
 	call vcf_mask_variants {
 		input:
 			sample_id = sample_id,
-			mask_vcf = snv_to_vcf.ffpe_mask_vcf,
-			mask_vcf_index = snv_to_vcf.ffpe_mask_vcf_idx
+			mask_vcf = snv_to_vcf.masked_vcf,
+			mask_vcf_index = snv_to_vcf.masked_vcf_idx
 	}
 
 	call vcf_select_variants {
@@ -52,10 +52,10 @@ workflow vcf_filter_mobsnvf {
 	}
 
 	output {
-		File ffpe_masked_vcf = vcf_mask_variants.masked_vcf
-		File ffpe_masked_vcf_index = vcf_mask_variants.masked_vcf_index
-		File ffpe_selected_vcf = vcf_select_variants.selected_vcf 
-		File ffpe_selected_vcf_index = vcf_select_variants.selected_vcf_index
+		File removed_vcf = vcf_mask_variants.masked_vcf
+		File removed_vcf_index = vcf_mask_variants.masked_vcf_index
+		File selected_vcf = vcf_select_variants.selected_vcf 
+		File selected_vcf_index = vcf_select_variants.selected_vcf_index
 	}
 
 }

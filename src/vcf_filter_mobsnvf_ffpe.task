@@ -1,5 +1,8 @@
-task vcf_ffpe_filter{
-	File input_vcf
+# Obsolete filter
+# problem 1: MOBSNVF will omit all indels from output VCF
+# problem 2: MOBSNVF uses a fixed p-value threshold
+task vcf_filter_mobsnvf_ffpe {
+	File vcf
 	File bam
 	File bai
 	File phi_json
@@ -19,13 +22,13 @@ task vcf_ffpe_filter{
 		fi
 
 		hts-mobsnvf identify -M freq -t ffpe \
-			-b ${bam} -V ${input_vcf} -g 0.05 \
+			-b ${bam} -V ${vcf} -g 0.01 \
 			$phi_opts \
-			-o ${sample_id}_ffpe_fixed.vcf
+			-o ${sample_id}_filtered.vcf
 	>>>
 
 	output {
-		File ffpe_fixed_vcf = "${sample_id}_ffpe_fixed.vcf"
+		File filtered_vcf = "${sample_id}_filtered.vcf"
 	}
 	
 	runtime {
