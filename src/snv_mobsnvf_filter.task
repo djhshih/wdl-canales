@@ -22,7 +22,7 @@ task snv_mobsnvf_filter {
 		
 		# set g=0 so that we keel all SNVs 
 		hts-mobsnvf identify -M freq -t ${damage_type} \
-			-b ${bam} -V ${input_snv} -g 0 \
+			-b ${bam} -V ${snv} -g 0 \
 			$phi_opts \
 			-o ${sample_id}_${damage_type}.snv > ${sample_id}_snv_${damage_type}_mobsnvf.tsv
 	>>>
