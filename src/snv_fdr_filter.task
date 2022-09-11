@@ -1,4 +1,3 @@
-# FIXME Do not take rscript as input
 task snv_fdr_filter {
 	File snv
 	File rscript

@@ -54,8 +54,8 @@ workflow vcf_filter_mobsnvf {
 	}
 
 	output {
-		File removed_vcf = vcf_mask_variants.masked_vcf
-		File removed_vcf_index = vcf_mask_variants.masked_vcf_index
+		File removed_vcf = snv_to_vcf.vcf
+		File removed_vcf_index = snv_to_vcf.vcf_idx
 		File selected_vcf = vcf_select_variants.selected_vcf 
 		File selected_vcf_index = vcf_select_variants.selected_vcf_index
 	}

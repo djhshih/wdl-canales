@@ -10,9 +10,11 @@ task vcf_annot_funcotator {
 			String output_format
 			Boolean compress
 			Boolean use_gnomad
-			# This should be updated when a new version of the data sources is released
-			# TODO: Make this dynamically chosen in the command.
-			File? data_sources_tar_gz = "gs://broad-public-datasets/funcotator/funcotator_dataSources.v1.6.20190124s.tar.gz"
+			# Either data_sources_tar_gz (for Google Cloud use)
+			#        e.g. "gs://broad-public-datasets/funcotator/funcotator_dataSources.v1.6.20190124s.tar.gz"
+			# or data_sources (for local use) must be defined
+			String? data_sources
+			File? data_sources_tar_gz
 			String? control_id
 			String? case_id
 			String? sequencing_center
@@ -69,9 +71,13 @@ task vcf_annot_funcotator {
 
 				# Extract our data sources:
 				echo "Extracting data sources zip file..."
-				mkdir datasources_dir
-				tar zxvf ~{data_sources_tar_gz} -C datasources_dir --strip-components 1
-				DATA_SOURCES_FOLDER="$PWD/datasources_dir"
+				if [[ -n ${data_sources_tar_gz} ]]; then
+					mkdir data_sources
+					tar zxvf ~{data_sources_tar_gz} -C datasources_dir --strip-components 1
+					DATA_SOURCES_FOLDER="$PWD/data_sources"
+				else
+					DATA_SOURCES_FOLDER=~{data_sources}
+				fi
 
 				# Handle gnomAD:
 				if ~{use_gnomad} ; then
@@ -125,7 +131,7 @@ task vcf_annot_funcotator {
 		}
 
 		output {
-				File funcotated_output_file = "~{output_file}"
-				File funcotated_output_file_index = "~{output_file_index}"
+				File output_file = "~{output_file}"
+				File output_file_index = "~{output_file_index}"
 		}
 }

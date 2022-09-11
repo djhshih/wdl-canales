@@ -10,6 +10,7 @@ workflow vcf_annot_funcotator {
 		File ref_dict
 		File funcotate_vcf_input
 		File funcotate_vcf_input_index
+		File? funco_data_sources_tar_gz
 
 		# default version is "hg19"
 		String? funco_reference_version
@@ -22,7 +23,6 @@ workflow vcf_annot_funcotator {
 		# default is false
 		Boolean? funco_use_gnomad_AF
 
-		File? funco_data_sources_tar_gz
 		String? case_id
 		String? control_id
 
@@ -68,16 +68,11 @@ workflow vcf_annot_funcotator {
 	Int preemptible_or_default = select_first([preemptible, 2])
 	Int max_retries_or_default = select_first([max_retries, 2])
 
-	#Boolean compress = select_first([compress_vcfs, false])
-	#Boolean make_bamout_or_default = select_first([make_bamout, false])
-
 	Boolean filter_funcotations_or_default = select_first([filter_funcotations, true])
 
 	# Disk sizes used for dynamic sizing
 	Int ref_size = ceil(size(ref_fasta, "GB") + size(ref_dict, "GB") + size(ref_fai, "GB"))
-	#Int tumor_bam_size = ceil(size(tumor_bam, "GB") + size(tumor_bai, "GB"))
 	Int gnomad_vcf_size = if defined(gnomad) then ceil(size(gnomad, "GB")) else 0
-	#Int normal_bam_size = if defined(normal_bam) then ceil(size(normal_bam, "GB") + size(normal_bai, "GB")) else 0
 
 	# If no tar is provided, the task downloads one from broads ftp server
 	Int funco_tar_size = if defined(funco_data_sources_tar_gz) then ceil(size(funco_data_sources_tar_gz, "GB") * 3) else 100
@@ -87,12 +82,6 @@ workflow vcf_annot_funcotator {
 	Int disk_pad = 10 + gatk_override_size + select_first([emergency_extra_disk,0])
 
 	# logic about output file names -- these are the names *without* .vcf extensions
-	#String output_basename = basename(tumor_bam, ".bam") #hacky way to strip .bam
-	#String unfiltered_name = output_basename + "-unfiltered"
-	#String filtered_name = output_basename + "-filtered"
-	#String funcotated_name = output_basename + "-funcotated"
-
-	#String output_vcf_name = output_basename + ".vcf"
 
 	Runtime standard_runtime = {"gatk_docker": gatk_docker, "gatk_override": gatk_override,
 						"max_retries": max_retries_or_default, "preemptible": preemptible_or_default, "cpu": small_task_cpu,
@@ -129,7 +118,7 @@ workflow vcf_annot_funcotator {
 	}
 
 	output {
-			File funcotated_file = vcf_funcotator.funcotated_output_file
-			File funcotated_file_index = vcf_funcotator.funcotated_output_file_index
+			File output_file = vcf_funcotator.output_file
+			File output_file_index = vcf_funcotator.output_file_index
 	}
 }
