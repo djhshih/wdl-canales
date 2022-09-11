@@ -1,4 +1,5 @@
 build = ./bin/wdl-assemble.py
+validate = womtool validate
 check = ./bin/check-wdl.sh 
 check_rc = ./bin/check-rc.sh
 
@@ -13,13 +14,14 @@ targets = \
 	wdl/vcf_filter_mobsnvf.wdl \
 	wdl/bam_mutect2.wdl \
 	wdl/vcf_rm_variants.wdl \
-	wdl/vcf_funcotator.wdl \
+	wdl/vcf_annot_funcotator.wdl \
 
 all: $(targets)
 	
 
 wdl/%.wdl: src/%.workflow
 	$(build) $< > $@
+	$(validate) $@
 
 clean:
 	rm -rf wdl/*
@@ -32,7 +34,10 @@ bin/cromwell:
 test/S01.bam:
 	test/make.sh
 
-check: $(targets) bin/cromwell test/S01.bam
+test: $(targets) bin/cromwell test/S01.bam
 	for f in $^; do $(check) $$f test/inputs/jes; done
 	$(check_rc) cromwell-executions
+
+check: $(targets)
+	for f in $^; do echo "Checking $$f ..."; $(validate) $$f; done
 

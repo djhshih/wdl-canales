@@ -1,6 +1,8 @@
-include vcf_funcotator.task
+version 1.0
 
-workflow vcf_funcotaor {
+include vcf_annot_funcotator.task
+
+workflow vcf_annot_funcotator {
 	input {
 		File? intervals
 		File ref_fasta
@@ -12,28 +14,28 @@ workflow vcf_funcotaor {
 		# default version is "hg19"
 		String? funco_reference_version
 		# default format is "MAF"
-    String? funco_output_format
+		String? funco_output_format
 		String funco_default_output_format = "MAF"
-      
+
 		# default is false
 		Boolean? funco_compress
 		# default is false
 		Boolean? funco_use_gnomad_AF
-				
+
 		File? funco_data_sources_tar_gz
 		String? case_id
 		String? control_id
 
 		File? gnomad
-		File? gnomad_idx		
+		File? gnomad_idx
 
 		String? sequencing_center
 		String? sequence_source
 		String? funco_transcript_selection_mode
 		File? funco_transcript_selection_list
-      	
+
 		Array[String]? funco_annotation_defaults
-    Array[String]? funco_annotation_overrides
+		Array[String]? funco_annotation_overrides
 		Array[String]? funcotator_excluded_fields
 		#Boolean? funco_filter_funcotations
 		String? funcotator_extra_args
@@ -68,7 +70,7 @@ workflow vcf_funcotaor {
 
 	#Boolean compress = select_first([compress_vcfs, false])
 	#Boolean make_bamout_or_default = select_first([make_bamout, false])
-    	
+
 	Boolean filter_funcotations_or_default = select_first([filter_funcotations, true])
 
 	# Disk sizes used for dynamic sizing
@@ -92,15 +94,13 @@ workflow vcf_funcotaor {
 
 	#String output_vcf_name = output_basename + ".vcf"
 
- 	Runtime standard_runtime = {"gatk_docker": gatk_docker, "gatk_override": gatk_override,
-            "max_retries": max_retries_or_default, "preemptible": preemptible_or_default, "cpu": small_task_cpu,
-            "machine_mem": small_task_mem * 1000, "command_mem": small_task_mem * 1000 - 500,
-            "disk": small_task_disk + disk_pad, "boot_disk_size": boot_disk_size}
+	Runtime standard_runtime = {"gatk_docker": gatk_docker, "gatk_override": gatk_override,
+						"max_retries": max_retries_or_default, "preemptible": preemptible_or_default, "cpu": small_task_cpu,
+						"machine_mem": small_task_mem * 1000, "command_mem": small_task_mem * 1000 - 500,
+						"disk": small_task_disk + disk_pad, "boot_disk_size": boot_disk_size}
 
-	#File funcotate_vcf_input = select_first([bam_alignment_artifacts_filter.filtered_vcf, vcf_filter.filtered_vcf])
-	#File funcotate_vcf_input_index = select_first([bam_alignment_artifacts_filter.filtered_vcf_idx, vcf_filter.filtered_vcf_idx])
 
-	call vcf_funcotator {
+	call vcf_annot_funcotator {
 			input:
 					ref_fasta = ref_fasta,
 					ref_fai = ref_fai,
@@ -125,12 +125,11 @@ workflow vcf_funcotaor {
 					filter_funcotations = filter_funcotations_or_default,
 					extra_args = funcotator_extra_args,
 					runtime_params = standard_runtime,
-					disk_space = ceil(size(funcotate_vcf_input, "GB") * large_input_to_output_multiplier)  + funco_tar_size + disk_pad
+					disk_space = ceil(size(funcotate_vcf_input, "GB") * large_input_to_output_multiplier) + funco_tar_size + disk_pad
 	}
 
 	output {
-			File? funcotated_file = vcf_funcotator.funcotated_output_file
-			File? funcotated_file_index = vcf_funcotator.funcotated_output_file_index
+			File funcotated_file = vcf_funcotator.funcotated_output_file
+			File funcotated_file_index = vcf_funcotator.funcotated_output_file_index
 	}
-
 }
