@@ -9,6 +9,7 @@ workflow vcf_filter_mobsnvf {
 	String sample_id
 	String damage_type
 	File bam
+	File bai
 	File vcf_header
 
 	call bam_phi_estimation {
@@ -22,6 +23,7 @@ workflow vcf_filter_mobsnvf {
 		input: 
 			sample_id = sample_id,
 			bam = bam,
+			bai = bai,
 			damage_type = damage_type,
 			phi_json = bam_phi_estimation.phi_json
 	}

@@ -3,8 +3,8 @@ task vcf_select_variants {
 	File vcf_index
 	String sample_id
 
-	Int memory_gb
-	Int cpu
+	Int? memory_gb = 2
+	Int? cpu = 1
 
 	command <<<
 		gatk SelectVariants \

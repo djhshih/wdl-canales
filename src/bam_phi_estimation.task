@@ -5,8 +5,8 @@ task bam_phi_estimation {
 	String sample_id
 	String damage_type
 
-	Int memory_gb
-	Int cpu
+	Int? memory_gb = 2
+	Int? cpu = 1
 
 	command <<<
 		hts-mobsnvf quantify -M freq -t ${damage_type} \

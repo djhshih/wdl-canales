@@ -3,8 +3,8 @@ task snv_fdr_filter {
 	File rscript
 	String sample_id
 	
-	Int memory_gb
-	Int cpu
+	Int? memory_gb = 2
+	Int? cpu = 1
 
 	command <<<
 		Rscript ${rscript} ${snv} -o ${sample_id}_failed.snv

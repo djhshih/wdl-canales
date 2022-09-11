@@ -7,8 +7,8 @@ task snv_mobsnvf_filter {
 	
 	String damage_type
 
-	Int memory_gb
-	Int cpu
+	Int? memory_gb = 2
+	Int? cpu = 1
 
 	command <<<
 		phi_n=$(grep -v 'bam_file' ${phi_json} | grep "phi" | sed -E 's/.*"phi":.([0-9.e+-]+),?/\1/')

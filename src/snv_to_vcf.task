@@ -4,8 +4,8 @@ task snv_to_vcf {
 	
 	String out_name
 	
-	Int memory_gb
-	Int cpu
+	Int? memory_gb = 2
+	Int? cpu = 1
 
 	command <<<
 		cat ${vcf_header} > ${out_name}.vcf
