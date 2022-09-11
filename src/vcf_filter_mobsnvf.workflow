@@ -8,6 +8,7 @@ include vcf_select_variants.task
 workflow vcf_filter_mobsnvf {
 	String sample_id
 	String damage_type
+	File vcf
 	File bam
 	File bai
 	File vcf_header
@@ -24,6 +25,7 @@ workflow vcf_filter_mobsnvf {
 			sample_id = sample_id,
 			bam = bam,
 			bai = bai,
+			snv = vcf,
 			damage_type = damage_type,
 			phi_json = bam_phi_estimation.phi_json
 	}
@@ -44,6 +46,7 @@ workflow vcf_filter_mobsnvf {
 	call vcf_mask_variants {
 		input:
 			sample_id = sample_id,
+			vcf = vcf,
 			mask_vcf = snv_to_vcf.vcf,
 			mask_vcf_index = snv_to_vcf.vcf_idx
 	}
