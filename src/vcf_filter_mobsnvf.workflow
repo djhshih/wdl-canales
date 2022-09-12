@@ -1,6 +1,7 @@
 include bam_phi_estimation.task
 include snv_mobsnvf_filter.task
 include snv_fdr_filter.task
+include vcf_to_header.task
 include snv_to_vcf.task
 include vcf_mask_variants.task
 include vcf_select_variants.task
@@ -11,7 +12,6 @@ workflow vcf_filter_mobsnvf {
 	File vcf
 	File bam
 	File bai
-	File vcf_header
 
 	call bam_phi_estimation {
 		input:
@@ -36,11 +36,16 @@ workflow vcf_filter_mobsnvf {
 			snv = snv_mobsnvf_filter.annotated_snv
 	}
 
+	call vcf_to_header {
+		input:
+			vcf = vcf
+	}
+
 	call snv_to_vcf {
 		input:
 			out_name = sample_id,
 			snv = snv_fdr_filter.failed_snv,
-			vcf_header = vcf_header
+			vcf_header = vcf_to_header.header
 	}
 
 	call vcf_mask_variants {
