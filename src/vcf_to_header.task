@@ -1,12 +1,13 @@
 task vcf_to_header {
 	File vcf
+	String sample_id
 
 	command <<<
 		# extract header lines but remove all columns after INFO
-		grep '^#' ${vcf} | sed 's/INFO\t.*/INFO/' > ${vcf}.header
+		grep '^#' ${vcf} | sed 's/INFO\t.*/INFO/' > ${sample_id}.vcf.header
 	>>>
 
 	output {
-		File header = "${vcf}.header" 
+		File header = "${sample_id}.vcf.header" 
 	}
 }
