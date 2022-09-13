@@ -38,7 +38,8 @@ workflow vcf_filter_mobsnvf {
 
 	call vcf_to_header {
 		input:
-			vcf = vcf
+			vcf = vcf,
+			sample_id = sample_id
 	}
 
 	call snv_to_vcf {
