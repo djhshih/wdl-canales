@@ -44,7 +44,7 @@ workflow vcf_filter_mobsnvf {
 
 	call snv_to_vcf {
 		input:
-			out_name = sample_id,
+			out_name = "${sample_id}_removed",
 			snv = snv_fdr_filter.failed_snv,
 			vcf_header = vcf_to_header.header
 	}
@@ -65,6 +65,8 @@ workflow vcf_filter_mobsnvf {
 	}
 
 	output {
+		File phi_json = bam_phi_estimation.phi_json
+		File annoated_snv = snv_mobsnvf_filter.annotated_snv
 		File removed_vcf = snv_to_vcf.vcf
 		File removed_vcf_index = snv_to_vcf.vcf_idx
 		File selected_vcf = vcf_select_variants.selected_vcf 
