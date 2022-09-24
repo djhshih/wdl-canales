@@ -3,6 +3,7 @@ task vcf_mask_variants {
 	File mask_vcf
 	File mask_vcf_index
 	String sample_id
+	String? mask_name = "artifact"
 
 	Int? memory_gb = 2
 	Int? cpu = 1
@@ -10,9 +11,9 @@ task vcf_mask_variants {
 	command <<<
 		gatk VariantFiltration \
 		-V ${vcf} \
-		--invalidate-previous-filters true \
+		--invalidate-previous-filters false \
 		--mask ${mask_vcf} \
-		--mask-name "artifact" \
+		--mask-name ${mask_name} \
 		-O ${sample_id}_masked.vcf
 	>>>
 	

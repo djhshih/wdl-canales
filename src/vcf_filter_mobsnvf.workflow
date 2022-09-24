@@ -53,6 +53,7 @@ workflow vcf_filter_mobsnvf {
 		input:
 			sample_id = sample_id,
 			vcf = vcf,
+			mask_name = damage_type,
 			mask_vcf = snv_to_vcf.vcf,
 			mask_vcf_index = snv_to_vcf.vcf_idx
 	}
