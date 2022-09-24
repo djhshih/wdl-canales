@@ -1,6 +1,6 @@
 task vcf_select_variants {
 	File vcf
-	File vcf_index
+	File vcf_index    # implicitly required
 	String sample_id
 
 	Int? memory_gb = 2
