@@ -2,12 +2,13 @@ task snv_fdr_filter {
 	File snv
 	File rscript
 	String sample_id
+	Float fp_cut
 	
 	Int? memory_gb = 2
 	Int? cpu = 1
 
 	command <<<
-		Rscript ${rscript} ${snv} -o ${sample_id}_failed.snv
+		Rscript ${rscript} ${snv} -o ${sample_id}_failed.snv --fp-cut ${fp_cut}
 	>>>
 
 	output {
