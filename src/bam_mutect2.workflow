@@ -80,7 +80,7 @@ include stats_merge.task
 include vcf_annot_funcotator.task
 include bam_alignment_artifacts_filter.task
 
-workflow mutect2 {
+workflow bam_mutect2 {
     input {
       # Mutect2 inputs
       File? intervals
