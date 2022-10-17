@@ -11,7 +11,7 @@ workflow vcf_annot_funcotator {
 		File ref_dict
 		File funcotate_vcf_input
 		File funcotate_vcf_input_index
-		String? funco_data_sources
+		File? funco_data_sources
 		File? funco_data_sources_tar_gz
 
 		# default version is "hg19"

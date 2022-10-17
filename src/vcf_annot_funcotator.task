@@ -13,7 +13,8 @@ task vcf_annot_funcotator {
 			# Either data_sources_tar_gz (for Google Cloud use)
 			#        e.g. "gs://broad-public-datasets/funcotator/funcotator_dataSources.v1.6.20190124s.tar.gz"
 			# or data_sources (for local use) must be defined
-			String? data_sources
+			# WARN  data_sources will be localized by copying!
+			File? data_sources
 			File? data_sources_tar_gz
 			String? control_id
 			String? case_id
@@ -70,13 +71,14 @@ task vcf_annot_funcotator {
 				export GATK_LOCAL_JAR=~{default="/root/gatk.jar" runtime_params.gatk_override}
 
 				# Extract our data sources:
-				echo "Extracting data sources zip file..."
 				if [[ -n ${data_sources_tar_gz} ]]; then
+					echo "Extracting data sources zip file..."
 					mkdir data_sources
 					tar zxvf ~{data_sources_tar_gz} -C datasources_dir --strip-components 1
 					DATA_SOURCES_FOLDER="$PWD/data_sources"
 				else
 					DATA_SOURCES_FOLDER=~{data_sources}
+					echo "Using data sources folder: $DATA_SOURCES_FOLDER"
 				fi
 
 				# Handle gnomAD:
