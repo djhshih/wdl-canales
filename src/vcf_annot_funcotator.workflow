@@ -1,5 +1,6 @@
 version 1.0
 
+include runtime.struct
 include vcf_annot_funcotator.task
 
 workflow vcf_annot_funcotator {
@@ -10,6 +11,7 @@ workflow vcf_annot_funcotator {
 		File ref_dict
 		File funcotate_vcf_input
 		File funcotate_vcf_input_index
+		String? funco_data_sources
 		File? funco_data_sources_tar_gz
 
 		# default version is "hg19"
@@ -101,6 +103,7 @@ workflow vcf_annot_funcotator {
 					output_format = if defined(funco_output_format) then "" + funco_output_format else funco_default_output_format,
 					compress = if defined(funco_compress) then select_first([funco_compress]) else false,
 					use_gnomad = if defined(funco_use_gnomad_AF) then select_first([funco_use_gnomad_AF]) else false,
+					data_sources = funco_data_sources,
 					data_sources_tar_gz = funco_data_sources_tar_gz,
 					case_id = case_id,
 					control_id = control_id,
@@ -118,7 +121,7 @@ workflow vcf_annot_funcotator {
 	}
 
 	output {
-			File output_file = vcf_funcotator.output_file
-			File output_file_index = vcf_funcotator.output_file_index
+			File output_file = vcf_annot_funcotator.output_file
+			File output_file_index = vcf_annot_funcotator.output_file_index
 	}
 }

@@ -67,6 +67,7 @@ version 1.0
 ## pages at https://hub.docker.com/r/broadinstitute/* for detailed licensing information
 ## pertaining to the included programs.
 
+include runtime.struct
 include intervals_split.task
 include bam_mutect2.task
 include orientation_model_learn.task
@@ -76,7 +77,7 @@ include pileups_calculate_contamination.task
 include vcfs_merge.task
 include vcf_filter_mutect2.task
 include stats_merge.task
-include vcf_funcotator.task
+include vcf_annot_funcotator.task
 include bam_alignment_artifacts_filter.task
 
 workflow mutect2 {
@@ -204,7 +205,7 @@ workflow mutect2 {
     }
 
     scatter (subintervals in intervals_split.interval_files ) {
-        call bam_m2 {
+        call bam_mutect2 {
             input:
                 intervals = subintervals,
                 ref_fasta = ref_fasta,
@@ -234,13 +235,13 @@ workflow mutect2 {
         }
     }
 
-    Int merged_vcf_size = ceil(size(ban_m2.unfiltered_vcf, "GB"))
-    Int merged_bamout_size = ceil(size(bam_m2.output_bamOut, "GB"))
+    Int merged_vcf_size = ceil(size(bam_mutect2.unfiltered_vcf, "GB"))
+    Int merged_bamout_size = ceil(size(bam_mutect2.output_bamOut, "GB"))
 
     if (run_ob_filter) {
         call orientation_model_learn {
             input:
-                f1r2_tar_gz = bam_m2.f1r2_counts,
+                f1r2_tar_gz = bam_mutect2.f1r2_counts,
                 runtime_params = standard_runtime,
                 mem = learn_read_orientation_mem
         }
@@ -248,8 +249,8 @@ workflow mutect2 {
 
     call vcfs_merge {
         input:
-            input_vcfs = bam_m2.unfiltered_vcf,
-            input_vcf_indices = bam_m2.unfiltered_vcf_idx,
+            input_vcfs = bam_mutect2.unfiltered_vcf,
+            input_vcf_indices = bam_mutect2.unfiltered_vcf_idx,
             output_name = unfiltered_name,
             compress = compress,
             runtime_params = standard_runtime
@@ -261,19 +262,19 @@ workflow mutect2 {
                 ref_fasta = ref_fasta,
                 ref_fai = ref_fai,
                 ref_dict = ref_dict,
-                bam_outs = bam_m2.output_bamOut,
+                bam_outs = bam_mutect2.output_bamOut,
                 output_vcf_name = basename(vcfs_merge.merged_vcf, ".vcf"),
                 runtime_params = standard_runtime,
                 disk_space = ceil(merged_bamout_size * large_input_to_output_multiplier) + disk_pad,
         }
     }
 
-    call stats_merge { input: stats = bam_m2.stats, runtime_params = standard_runtime }
+    call stats_merge { input: stats = bam_mutect2.stats, runtime_params = standard_runtime }
 
     if (defined(variants_for_contamination)) {
         call pileup_summaries_merge as MergeTumorPileups {
             input:
-                input_tables = flatten(bam_m2.tumor_pileups),
+                input_tables = flatten(bam_mutect2.tumor_pileups),
                 output_name = output_basename,
                 ref_dict = ref_dict,
                 runtime_params = standard_runtime
@@ -282,7 +283,7 @@ workflow mutect2 {
         if (defined(normal_bam)){
             call pileup_summaries_merge as MergeNormalPileups {
                 input:
-                    input_tables = flatten(bam_m2.normal_pileups),
+                    input_tables = flatten(bam_mutect2.normal_pileups),
                     output_name = output_basename,
                     ref_dict = ref_dict,
                     runtime_params = standard_runtime
@@ -338,7 +339,7 @@ workflow mutect2 {
     if (run_funcotator_or_default) {
         File funcotate_vcf_input = select_first([bam_alignment_artifacts_filter.filtered_vcf, vcf_filter_mutect2.filtered_vcf])
         File funcotate_vcf_input_index = select_first([bam_alignment_artifacts_filter.filtered_vcf_idx, vcf_filter_mutect2.filtered_vcf_idx])
-        call vcf_funcotator {
+        call vcf_annot_funcotator {
             input:
                 ref_fasta = ref_fasta,
                 ref_fai = ref_fai,
@@ -351,8 +352,8 @@ workflow mutect2 {
                 compress = if defined(funco_compress) then select_first([funco_compress]) else false,
                 use_gnomad = if defined(funco_use_gnomad_AF) then select_first([funco_use_gnomad_AF]) else false,
                 data_sources_tar_gz = funco_data_sources_tar_gz,
-                case_id = bam_m2.tumor_sample[0],
-                control_id = bam_m2.normal_sample[0],
+                case_id = bam_mutect2.tumor_sample[0],
+                control_id = bam_mutect2.normal_sample[0],
                 sequencing_center = sequencing_center,
                 sequence_source = sequence_source,
                 transcript_selection_mode = funco_transcript_selection_mode,
@@ -374,8 +375,8 @@ workflow mutect2 {
         File mutect_stats = stats_merge.merged_stats
         File? contamination_table = pileups_calculate_contamination.contamination_table
 
-        File? funcotated_file = vcf_funcotator.funcotated_output_file
-        File? funcotated_file_index = vcf_funcotator.funcotated_output_file_index
+        File? funcotated_file = vcf_annot_funcotator.output_file
+        File? funcotated_file_index = vcf_annot_funcotator.output_file_index
         File? bamout = bam_outs_merge.merged_bam_out
         File? bamout_index = bam_outs_merge.merged_bam_out_index
         File? maf_segments = pileups_calculate_contamination.maf_segments
